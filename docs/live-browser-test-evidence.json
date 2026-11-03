@@ -1,37 +1,39 @@
 {
-  "date": "2026-11-03T05:43:08.225Z",
+  "date": "2026-11-03T05:47:41.386Z",
+  "commit": "e00baad",
   "website": "https://skybreak-zeta.vercel.app",
   "server": "https://skybreak-multiplayer.onrender.com",
   "checks": [
-    "browser engine loaded",
-    "lobby connected",
-    "room created",
-    "invite joined",
-    "chat delivered",
-    "ready gate",
+    "engine startup",
+    "room create",
+    "invite join",
+    "ready up",
     "host start",
-    "two player IDs",
-    "movement",
-    "shooting"
+    "two authoritative player IDs",
+    "movement synchronization"
   ],
-  "performance_note": "Two browser clients before spatial indexing ran at 6–7 FPS on this test machine. Alpha effect counters include the menu preview; only snapshot counts and player state certify this match.",
+  "earlier_verified": [
+    "lobby chat",
+    "shooting and ammunition"
+  ],
+  "performance_note": "Two concurrent production browser clients measured about 15 FPS after spatial indexing, versus 6–7 FPS before it, on this machine. This is not a 60 FPS certification.",
   "alpha": {
     "discovered": {},
-    "fps": 6,
+    "fps": 13,
     "lobby_status": "CONNECTED · LOBBY",
     "local_id": 1,
     "map": 0,
     "metrics": {
-      "hits": 51,
-      "kills": 9,
-      "max_snapshot_bytes": 591,
+      "hits": 0,
+      "kills": 0,
+      "max_snapshot_bytes": 0,
       "reconnects": 0,
       "rejected": 0,
-      "shots": 91,
-      "snapshots": 1605
+      "shots": 0,
+      "snapshots": 916
     },
     "phase": "match",
-    "ping_ms": 384,
+    "ping_ms": 311,
     "players": [
       {
         "ammo": [
@@ -46,13 +48,13 @@
         "hp": 100,
         "id": 1,
         "kills": 0,
-        "name": "Pilot",
+        "name": "W",
         "online": true,
         "position": [
-          232.123291015625,
-          333.321197509766
+          795.199768066406,
+          702.40478515625
         ],
-        "seq": 3962
+        "seq": 2736
       },
       {
         "ammo": [
@@ -70,16 +72,16 @@
         "name": "W",
         "online": true,
         "position": [
-          1886.89929199219,
-          1051.90686035156
+          2449.77270507812,
+          341.964660644531
         ],
-        "seq": 3963
+        "seq": 2711
       }
     ],
-    "room": "77ZFJN",
+    "room": "XANRRZ",
     "screen": "game",
     "status": "CONNECTED · ONLINE",
-    "time": 81.1499999999967,
+    "time": 46.6999999999986,
     "transport": "websocket"
   },
   "bravo": {
@@ -94,11 +96,11 @@
       "max_snapshot_bytes": 0,
       "reconnects": 0,
       "rejected": 0,
-      "shots": 12,
-      "snapshots": 3189
+      "shots": 0,
+      "snapshots": 918
     },
     "phase": "match",
-    "ping_ms": 188,
+    "ping_ms": 194,
     "players": [
       {
         "ammo": [
@@ -113,13 +115,13 @@
         "hp": 100,
         "id": 1,
         "kills": 0,
-        "name": "Pilot",
+        "name": "W",
         "online": true,
         "position": [
-          160.339828491211,
-          338.991149902344
+          795.347900390625,
+          702.412170410156
         ],
-        "seq": 8495
+        "seq": 2761
       },
       {
         "ammo": [
@@ -137,16 +139,16 @@
         "name": "W",
         "online": true,
         "position": [
-          1886.89929199219,
-          1051.90686035156
+          2311.77270507812,
+          492.414611816406
         ],
-        "seq": 8489
+        "seq": 2735
       }
     ],
-    "room": "77ZFJN",
+    "room": "XANRRZ",
     "screen": "game",
     "status": "CONNECTED · ONLINE",
-    "time": 160.70000000002,
+    "time": 47.1499999999986,
     "transport": "websocket"
   }
 }

@@ -31,4 +31,8 @@ The website exposes a Connection details panel with FPS, ping, snapshot count an
 
 ## Known limits
 
+Production verification on 2026-11-03: Vercel and Render both deployed `e00baad`; two real browser tabs joined an invite and started a synchronized match. The real Render integration test passed with 8 hits, 1 kill, 304/271 snapshots and one gameplay reconnect. The simulation suite passed 48 checks. [GitHub CI](https://github.com/Alexwatson-de/Skybreak/actions/runs/41585625956) passed the Linux checks.
+
+Spatial indexing preserved the previous collision trajectories on all three maps. A 3,000-step native movement benchmark took 500,883 µs without indexing and 122,289 µs with indexing (about 4.1× faster). Two simultaneous browser clients on the test machine improved from roughly 6–7 FPS to 15 FPS, still below a smooth 60 FPS target. These measurements do not certify performance on other devices. Sanitized live evidence and the actual browser screenshot are in `live-online-test-evidence.json`, `live-browser-test-evidence.json` and `live-browser-match.png`.
+
 Keyboard/mouse only; no mobile touch, persistent accounts, host migration or cross-region matchmaking. Render Free can cold-start after inactivity and loses in-memory sessions on restart. No guarantee of zero lag or unlimited free hosting is made. Physical multi-device, adverse Internet packet-loss, long soak and recipient-Mac checks require their actual environments. Docker/Linux build verification is supplied by the CI/hosting run rather than inferred from macOS tests.
