@@ -18,7 +18,7 @@ Prerequisites: Godot 4.5 Android export templates, Android SDK platform 35/build
 GODOT_BIN=/path/to/Godot bash scripts/build_android.sh
 ```
 
-The resulting installable APK is `builds/android/Skybreak-Arena.apk`. Install it with `adb install -r builds/android/Skybreak-Arena.apk`, or transfer it to an Android device and allow installation from your file manager. Android local Wi-Fi/hostpot rooms require the same network and the host's reachable LAN IP.
+The resulting installable, debug-signed APK is `builds/android/Skybreak-Arena.apk`. Install it with `adb install -r builds/android/Skybreak-Arena.apk`, or transfer it to an Android device and allow installation from your file manager. Android local Wi-Fi/hostpot rooms require the same network and the host's reachable LAN IP. Use a separately protected release key before any store distribution.
 
 The interface stays at native display resolution. **Connection details → Graphics quality** adjusts the terrain detail without downscaling labels, avatars or the HUD. Auto reduces world detail during slower matches; Low and High are also available.
 
