@@ -1,5 +1,5 @@
 {
-  "date": "2026-11-03T04:11:07.694Z",
+  "date": "2026-11-03T04:30:38.356Z",
   "client_kind": "engine-project",
   "transport": "websocket",
   "checks": [
@@ -23,12 +23,12 @@
     "local_id": 1,
     "map": 0,
     "metrics": {
-      "hits": 15,
+      "hits": 10,
       "kills": 2,
       "max_snapshot_bytes": 0,
       "reconnects": 0,
       "rejected": 0,
-      "shots": 146,
+      "shots": 123,
       "snapshots": 319
     },
     "phase": "match",
@@ -36,7 +36,7 @@
     "players": [
       {
         "ammo": [
-          10,
+          0,
           0,
           0,
           0,
@@ -44,14 +44,14 @@
           0
         ],
         "deaths": 1,
-        "hp": 87,
+        "hp": 100,
         "id": 1,
         "kills": 1,
         "name": "Alpha",
         "online": true,
         "position": [
-          984.412902832031,
-          722.86083984375
+          924.997985839844,
+          1265.04040527344
         ],
         "seq": 954
       },
@@ -60,27 +60,27 @@
           10,
           0,
           0,
-          32,
           0,
+          2,
           0
         ],
         "deaths": 1,
-        "hp": 100,
+        "hp": 89,
         "id": 2,
         "kills": 1,
         "name": "Bravo",
         "online": true,
         "position": [
-          788.475219726562,
-          702.070861816406
+          1029.50048828125,
+          242.588806152344
         ],
-        "seq": 887
+        "seq": 884
       }
     ],
     "room": "",
     "screen": "game",
     "status": "CONNECTED · ONLINE",
-    "time": 17.0500000000003,
+    "time": 17.3500000000003,
     "transport": "websocket"
   },
   "bravo": {
@@ -89,20 +89,20 @@
     "local_id": 2,
     "map": 0,
     "metrics": {
-      "hits": 15,
+      "hits": 10,
       "kills": 2,
       "max_snapshot_bytes": 0,
       "reconnects": 1,
       "rejected": 0,
-      "shots": 143,
-      "snapshots": 298
+      "shots": 120,
+      "snapshots": 296
     },
     "phase": "match",
-    "ping_ms": 16,
+    "ping_ms": 33,
     "players": [
       {
         "ammo": [
-          10,
+          0,
           0,
           0,
           0,
@@ -110,43 +110,43 @@
           0
         ],
         "deaths": 1,
-        "hp": 87,
+        "hp": 100,
         "id": 1,
         "kills": 1,
         "name": "Alpha",
         "online": true,
         "position": [
-          981.787902832031,
-          703.171875
+          924.997985839844,
+          1265.04040527344
         ],
-        "seq": 957
+        "seq": 954
       },
       {
         "ammo": [
           10,
           0,
           0,
-          32,
           0,
+          2,
           0
         ],
         "deaths": 1,
-        "hp": 100,
+        "hp": 89,
         "id": 2,
         "kills": 1,
         "name": "Bravo",
         "online": true,
         "position": [
-          804.246643066406,
-          702.604614257812
+          1029.50048828125,
+          242.588806152344
         ],
-        "seq": 890
+        "seq": 884
       }
     ],
     "room": "",
     "screen": "game",
     "status": "CONNECTED · ONLINE",
-    "time": 17.1000000000003,
+    "time": 17.3500000000003,
     "transport": "websocket"
   }
 }

@@ -51,7 +51,7 @@ The included supervisor is for one trusted host with bounded rooms/processes. In
 
 Gun ownership, per-type grenade stock and active grenade selection are included in compact snapshots. Pickup timers identify entries in the shared static map loot table. Weapon pickup is an edge-triggered E intention; health/grenade supplies are proximity-triggered. The host authenticates protocol version 2 before admitting a client, so 1.0 clients cannot silently use the wrong terrain or inventory codec.
 
-The static terrain is cached in a separate canvas layer. Headless processes do not construct or draw this layer, equipment art or menu controls, and cap their process loop at 60 FPS while retaining the shared fixed simulation tick.
+The static terrain is rasterized once into a single texture for the active map, so camera motion does not replay thousands of dirt, brick and grass draw commands. The previous map texture is released when switching maps. Collision/cover still use the original polygons; cheap bounding-box rejection avoids unnecessary polygon work. Headless processes do not construct or draw this layer, equipment art or menu controls, and cap their process loop at 60 FPS while retaining the shared fixed simulation tick.
 
 ## Browser lifecycle
 

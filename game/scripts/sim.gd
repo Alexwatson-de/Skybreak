@@ -60,11 +60,14 @@ static func move(p: Dictionary,input: Dictionary,platforms: Array,dt: float) -> 
 		pos+=v*dt*0.5
 		for iteration in range(3):
 			var moved=false
+			var bounds=Rect2(pos-Vector2(15,25),Vector2(30,50))
 			for shape in platforms:
+				if shape is Dictionary and not bounds.intersects(shape.bounds):continue
 				var correction=penetration(pos,Vector2(15,25),shape)
 				if correction.length_squared()<0.000001:continue
 				var normal=correction.normalized()
 				pos+=correction+normal*0.002
+				bounds.position=pos-Vector2(15,25)
 				if normal.y< -0.55:p.ground=true
 				if v.dot(normal)<0:v-=normal*v.dot(normal)
 				moved=true
@@ -74,8 +77,10 @@ static func move(p: Dictionary,input: Dictionary,platforms: Array,dt: float) -> 
 
 static func wall_distance(origin: Vector2,direction: Vector2,distance: float,platforms: Array) -> float:
 	var best=distance
+	var ray_bounds=Rect2(origin,Vector2.ZERO).expand(origin+direction*distance).grow(0.001)
 	for value in platforms:
 		var shape=collision_shape(value)
+		if not ray_bounds.intersects(shape.bounds):continue
 		var lo=0.0;var hi=distance
 		for j in range(0,shape.slabs.size(),2):
 			var slab: Vector3=shape.slabs[j];var axis=Vector2(slab.x,slab.y)

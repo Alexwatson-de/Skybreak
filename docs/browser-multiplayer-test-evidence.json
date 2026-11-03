@@ -1,0 +1,137 @@
+{
+  "scope": "local browser clients",
+  "alpha": {
+    "discovered": {},
+    "fps": 14,
+    "lobby_status": "CONNECTED · LOBBY",
+    "local_id": 1,
+    "map": 0,
+    "metrics": {
+      "hits": 6,
+      "kills": 1,
+      "max_snapshot_bytes": 0,
+      "reconnects": 0,
+      "rejected": 0,
+      "shots": 2024,
+      "snapshots": 4575
+    },
+    "phase": "match",
+    "ping_ms": 140,
+    "players": [
+      {
+        "ammo": [
+          4,
+          0,
+          1,
+          0,
+          0,
+          0
+        ],
+        "deaths": 0,
+        "hp": 61,
+        "id": 2,
+        "kills": 1,
+        "name": "WebBravo",
+        "online": true,
+        "position": [
+          1568.21936035156,
+          1148.55261230469
+        ],
+        "seq": 13172
+      },
+      {
+        "ammo": [
+          9,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "deaths": 1,
+        "hp": 100,
+        "id": 1,
+        "kills": 0,
+        "name": "WebAlpha",
+        "online": true,
+        "position": [
+          1428.6005859375,
+          1543.40649414062
+        ],
+        "seq": 13415
+      }
+    ],
+    "room": "GVJ7DG",
+    "screen": "game",
+    "status": "CONNECTED · ONLINE",
+    "time": 229.300000000075,
+    "transport": "websocket"
+  },
+  "bravo": {
+    "discovered": {},
+    "fps": 12,
+    "lobby_status": "CONNECTED · LOBBY",
+    "local_id": 2,
+    "map": 0,
+    "metrics": {
+      "hits": 6,
+      "kills": 1,
+      "max_snapshot_bytes": 0,
+      "reconnects": 1,
+      "rejected": 0,
+      "shots": 2019,
+      "snapshots": 4535
+    },
+    "phase": "match",
+    "ping_ms": 164,
+    "players": [
+      {
+        "ammo": [
+          4,
+          0,
+          1,
+          0,
+          0,
+          0
+        ],
+        "deaths": 0,
+        "hp": 61,
+        "id": 2,
+        "kills": 1,
+        "name": "WebBravo",
+        "online": true,
+        "position": [
+          1450.49938964844,
+          1208.59753417969
+        ],
+        "seq": 13143
+      },
+      {
+        "ammo": [
+          9,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "deaths": 1,
+        "hp": 100,
+        "id": 1,
+        "kills": 0,
+        "name": "WebAlpha",
+        "online": true,
+        "position": [
+          1584.95568847656,
+          1674.14233398438
+        ],
+        "seq": 13382
+      }
+    ],
+    "room": "GVJ7DG",
+    "screen": "game",
+    "status": "CONNECTED · ONLINE",
+    "time": 228.800000000074,
+    "transport": "websocket"
+  }
+}

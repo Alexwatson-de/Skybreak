@@ -20,7 +20,7 @@ func _ready() -> void:
 	if DisplayServer.get_name()=="headless":
 		set_process(false)
 		return
-	terrain=load("res://scripts/terrain_art.gd").new()
+	terrain=load("res://scripts/terrain_cache.gd").new()
 	terrain.show_behind_parent=true
 	add_child(terrain)
 	Net.effects.connect(_effects)
