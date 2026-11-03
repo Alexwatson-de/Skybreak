@@ -1,28 +1,30 @@
 import { test } from 'node:test';
 import { request } from 'node:http';
+import { request as requestHttps } from 'node:https';
 import assert from 'node:assert/strict';
 import { spawn, type ChildProcess } from 'node:child_process';
 import { io, type Socket } from 'socket.io-client';
 import { resolve } from 'node:path';
 import { writeFile, readFile, mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-const url='http://127.0.0.1:3017';
+const remote=!!process.env.TEST_LOBBY_URL;
+const url=process.env.TEST_LOBBY_URL || 'http://127.0.0.1:3017';
 const root=resolve('..');
 const godot=process.env.GODOT_BIN || resolve(root,'.runtime/Godot.app/Contents/MacOS/Godot');
 function event(s:Socket,name:string,predicate:(d:any)=>boolean=()=>true,timeout=16000):Promise<any>{return new Promise((done,reject)=>{const timer=setTimeout(()=>{s.off(name,on);reject(Error(`Timed out waiting for ${name}`));},timeout);const on=(d:any)=>{if(predicate(d)){clearTimeout(timer);s.off(name,on);done(d);}};s.on(name,on);});}
 async function connect(name:string,session?:string){const s=io(url,{transports:['websocket'],autoConnect:false,auth:{name,char:1,session},reconnection:false});const ready=event(s,'session');s.connect();return {socket:s,session:await ready};}
 const delay=(ms:number)=>new Promise(r=>setTimeout(r,ms));
 function client(args:string[],log:string){const binary=process.env.CLIENT_BIN||godot;const runtimeArgs=process.env.CLIENT_BIN?['--headless']:['--headless','--path',resolve(root,'game')];const p=spawn(binary,[...runtimeArgs,'--',...args],{stdio:['ignore','pipe','pipe']});let out='';p.stdout?.on('data',d=>out+=d);p.stderr?.on('data',d=>out+=d);const result=new Promise<number|null>((done)=>p.on('exit',async(code)=>{await writeFile(log,out);done(code);}));return {p,result};}
-test(`real lobby → ready checks → dedicated ${process.env.GAME_TRANSPORT || 'enet'} → two native clients → reconnect`, {timeout:65000},async()=>{
- const server=spawn(process.execPath,['dist/index.js'],{env:{...process.env,PORT:'3017',PUBLIC_URL:url,GAME_PORT_BASE:'29700',GODOT_BIN:godot},stdio:['ignore','pipe','pipe']});
- let logs='';server.stdout.on('data',d=>logs+=d);server.stderr.on('data',d=>logs+=d);
+test(`real lobby → ready checks → dedicated ${process.env.GAME_TRANSPORT || 'enet'} → two native clients → reconnect`, {timeout:remote?150000:65000},async()=>{
+ const server=remote?undefined:spawn(process.execPath,['dist/index.js'],{env:{...process.env,PORT:'3017',PUBLIC_URL:url,GAME_PORT_BASE:'29700',GODOT_BIN:godot},stdio:['ignore','pipe','pipe']});
+ let logs='';server?.stdout.on('data',d=>logs+=d);server?.stderr.on('data',d=>logs+=d);
  const sockets:Socket[]=[];const processes:ChildProcess[]=[];const dir=await mkdtemp(resolve(tmpdir(),'skybreak-test-'));
  try{
-  for(let i=0;i<80;i++){try{if((await fetch(url+'/health')).ok)break;}catch{}await delay(100);}
+  for(let i=0;i<(remote?700:80);i++){try{if((await fetch(url+'/health')).ok)break;}catch{}await delay(100);}
   const health=await (await fetch(url+'/health')).json();assert.equal(health.protocol,2);
-  async function upgradeStatus(path:string,origin='http://127.0.0.1:8123') {
+  async function upgradeStatus(path:string,origin=process.env.TEST_WEB_ORIGIN || 'http://127.0.0.1:8123') {
     return new Promise<number>((done,reject)=>{
-      const req=request(url+path,{headers:{Connection:'Upgrade',Upgrade:'websocket',Origin:origin}},res=>{res.resume();done(res.statusCode!);});
+      const req=(url.startsWith('https:')?requestHttps:request)(url+path,{headers:{Connection:'Upgrade',Upgrade:'websocket','Sec-WebSocket-Version':'13','Sec-WebSocket-Key':'dGhlIHNhbXBsZSBub25jZQ==',Origin:origin}},res=>{res.resume();done(res.statusCode!);});
       req.setTimeout(2500,()=>{req.destroy();reject(Error('Upgrade was left hanging'));});req.on('error',reject);req.end();
     });
   }
@@ -54,8 +56,8 @@ test(`real lobby → ready checks → dedicated ${process.env.GAME_TRANSPORT || 
   console.log(JSON.stringify({reportA,reportB}));
   assert.ok(reportA.metrics.snapshots>150);assert.ok(reportB.metrics.snapshots>100);assert.equal(reportA.players.length,2);assert.equal(reportB.players.length,2);
   assert.equal(reportB.metrics.reconnects,1);assert.equal(reportB.local_id,2);assert.ok(reportA.metrics.shots>20);assert.ok(reportA.metrics.hits>0);assert.ok(reportA.players.every((p:any)=>p.hp>=0&&p.hp<=100));
-  assert.ok(!logs.includes('SCRIPT ERROR'));assert.ok(!logs.includes('above the MTU'));
-  await writeFile(resolve(root,'docs/online-test-evidence.json'),JSON.stringify({date:new Date().toISOString(),client_kind:process.env.CLIENT_BIN?'packaged-macos':'engine-project',transport:ta.transport,checks:['room codes','invite link','lobby chat','host authorization','ready gate','team balance','dedicated startup','unique match tickets','2 ENet clients','snapshots','hits','lobby session recovery','ENet reconnect'],alpha:reportA,bravo:reportB},null,2));
-  await writeFile(resolve(root,'docs/online-server-test.log'),logs);
- }finally{await writeFile(resolve(root,'docs/latest-server-test.log'),logs);for(const s of sockets)s.disconnect();for(const p of processes)p.kill();server.kill('SIGTERM');await delay(300);await rm(dir,{recursive:true,force:true});}
+  if(!remote){assert.ok(!logs.includes('SCRIPT ERROR'));assert.ok(!logs.includes('above the MTU'));}
+  await writeFile(resolve(root,remote?'docs/live-online-test-evidence.json':'docs/online-test-evidence.json'),JSON.stringify({date:new Date().toISOString(),scope:remote?'live service':'local',endpoint:url,client_kind:process.env.CLIENT_BIN?'packaged-macos':'engine-project',transport:ta.transport,checks:['room codes','invite link','lobby chat','host authorization','ready gate','team balance','dedicated startup','unique match tickets','2 authoritative gameplay clients','snapshots','hits','lobby session recovery','gameplay reconnect'],alpha:reportA,bravo:reportB},null,2));
+  if(!remote)await writeFile(resolve(root,'docs/online-server-test.log'),logs);
+ }finally{if(!remote)await writeFile(resolve(root,'docs/latest-server-test.log'),logs);if(remote){for(const s of sockets)if(s.connected)s.emit('leave',{});await delay(300);}for(const s of sockets)s.disconnect();for(const p of processes)p.kill();server?.kill('SIGTERM');await delay(300);await rm(dir,{recursive:true,force:true});}
 });
