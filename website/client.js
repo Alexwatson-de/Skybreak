@@ -22,6 +22,11 @@
   window.Skybreak = {
     update(report) {
       const playing = ['match', 'results'].includes(report.phase);
+      if (quality === 'auto' && !playing && autoWidth !== 1280) {
+        autoWidth = 1280;
+        slowFrames = fastFrames = 0;
+        resizeCanvas();
+      }
       // Hidden tabs are browser-throttled; their FPS must not lower quality.
       if (quality === 'auto' && playing && !document.hidden && report.fps > 0) {
         slowFrames = report.fps < 30 ? slowFrames + 1 : 0;
