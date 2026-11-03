@@ -15,5 +15,5 @@ func _draw() -> void:
 		draw_colored_polygon(points,col[2].darkened(0.15))
 	draw_rect(Rect2(1,91,size.x-2,size.y-92),Color("20281f"))
 	draw_string(font,Vector2(14,116),Maps.NAMES[map_id],HORIZONTAL_ALIGNMENT_LEFT,-1,14,Color("ecdbb7") if selected else Color("b9c2a7"))
-	draw_string(font,Vector2(14,136),["CATACOMBS / 3 LEVELS","TEMPLE / VERTICAL ROUTES","MINE / OPEN SHAFTS"][map_id],HORIZONTAL_ALIGNMENT_LEFT,-1,9,Color("8f9d81"))
+	draw_string(font,Vector2(14,136),["CATACOMBS / 3 LEVELS","TEMPLE / VERTICAL ROUTES","MINE / OPEN SHAFTS","OPEN AIR / WATCHTOWER","SANDSTONE / SECRET CHAMBERS","LONG LANES / LOW BYPASSES"][map_id],HORIZONTAL_ALIGNMENT_LEFT,-1,9,Color("8f9d81"))
 	if is_hovered():draw_rect(Rect2(Vector2.ZERO,size),Color(1,0.9,0.65,0.04))

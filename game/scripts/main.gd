@@ -38,6 +38,8 @@ var settings_volume=0.55
 var discovery_box: VBoxContainer
 var closing=false
 var browser_report_at=0.0
+var chat_draft=""
+var chat_entry: LineEdit
 
 func _ready() -> void:
 	if DisplayServer.get_name()=="headless":Engine.max_fps=60
@@ -51,7 +53,7 @@ func _ready() -> void:
 		settings_volume=float(settings.get_value("audio","volume",0.55))
 	lobby_url=str(args.get("lobby",lobby_url))
 	player_name=str(args.get("name",player_name))
-	selected_map=clampi(int(args.get("map",0)),0,2)
+	selected_map=clampi(int(args.get("map",0)),0,ArenaMaps.NAMES.size()-1)
 	selected_mode=clampi(int(args.get("mode",0)),0,1)
 	Net.profile={"name":player_name,"char":selected_character}
 	Net.map_id=selected_map
@@ -132,6 +134,9 @@ func _network_changed() -> void:
 	if is_inside_tree() and ui: build_ui()
 
 func _lobby_changed() -> void:
+	if not Lobby.room.is_empty():
+		selected_map=clampi(int(Lobby.room.get("map",0)),0,ArenaMaps.NAMES.size()-1)
+		selected_mode=clampi(int(Lobby.room.get("mode",0)),0,1)
 	if not Lobby.room.is_empty() and Net.state.get("phase","") not in ["match","results"]: screen="online_lobby"
 	if auto and not Lobby.room.is_empty() and Lobby.room.get("phase","")=="lobby":
 		var everyone_ready=true
@@ -211,6 +216,9 @@ func navigate(destination: String) -> void:
 
 func build_ui() -> void:
 	if closing or DisplayServer.get_name()=="headless":return
+	var restore_chat=is_instance_valid(chat_entry) and chat_entry.has_focus()
+	var chat_caret=chat_entry.caret_column if is_instance_valid(chat_entry) else 0
+	chat_entry=null
 	for child in ui.get_children():ui.remove_child(child);child.queue_free()
 	var playing=screen=="game"
 	Input.mouse_mode=Input.MOUSE_MODE_HIDDEN if playing and not paused and Net.state.get("phase","")!="results" else Input.MOUSE_MODE_VISIBLE
@@ -226,7 +234,7 @@ func build_ui() -> void:
 		var wide=screen in ["lobby","online_lobby"]
 		var base=Panel.new();base.position=Vector2(52,136);base.size=Vector2(732 if wide else 488,622)
 		base.add_theme_stylebox_override("panel",style(Color(0.085,0.11,0.078,0.97),Color("4b573f"),12));ui.add_child(base)
-		var version=label("FIELD UPDATE 1.2  /  ORIGINAL WORLDS. SHARED SKIES.",11,Color("879675"),ui);version.position=Vector2(58,849)
+		var version=label("FIELD UPDATE 1.3  /  ORIGINAL WORLDS. SHARED SKIES.",11,Color("879675"),ui);version.position=Vector2(58,849)
 	content=VBoxContainer.new();content.add_theme_constant_override("separation",10)
 	if not playing:
 		var scroll=ScrollContainer.new();scroll.position=Vector2(76,160);scroll.size=Vector2(684 if screen in ["lobby","online_lobby"] else 438,574)
@@ -257,6 +265,9 @@ func build_ui() -> void:
 	status_label=Label.new();status_label.position=Vector2(76,802) if not playing else Vector2(28,78)
 	status_label.visible=not playing
 	status_label.add_theme_font_size_override("font_size",12);status_label.add_theme_color_override("font_color",Color("a9b992"));ui.add_child(status_label)
+	if restore_chat and is_instance_valid(chat_entry):
+		chat_entry.grab_focus.call_deferred()
+		chat_entry.set_caret_column.call_deferred(mini(chat_caret,chat_entry.text.length()))
 	toast_label=Label.new();toast_label.position=Vector2(76,773) if not playing else Vector2(425,125)
 	toast_label.add_theme_font_size_override("font_size",14);toast_label.add_theme_color_override("font_color",Color("ebc37e"));ui.add_child(toast_label)
 
@@ -283,15 +294,20 @@ func menu_ui() -> void:
 	var notes=label("E  Pick up a weapon
 Q  Select grenade type    /    G  Throw
 1 - 6  Switch collected weapons",14,Color("aab897"))
-	for j in range(3):
+	for j in range(ArenaMaps.NAMES.size()):
 		var card=load("res://scripts/map_card.gd").new();card.map_id=j;card.selected=selected_map==j
-		card.position=Vector2(594+j*266,626);card.size=Vector2(252,151);card.mouse_default_cursor_shape=Control.CURSOR_POINTING_HAND
+		card.position=Vector2(594+(j%3)*266,484+(j/3)*150);card.size=Vector2(252,140);card.mouse_default_cursor_shape=Control.CURSOR_POINTING_HAND
 		card.action_mode=BaseButton.ACTION_MODE_BUTTON_PRESS;card.pressed.connect(func():selected_map=j;build_ui());ui.add_child(card)
 
+func select_operator(index: int) -> void:
+	selected_character=index;Net.profile.char=index;save_settings()
+	if Lobby.connected:Lobby.send_event("profile",{"name":player_name,"char":index})
+	build_ui()
+
 func character_ui() -> void:
-	title("YOUR OPERATOR","Choose your pilot.","Four original operators. The same movement and equipment rules for everyone.")
+	title("YOUR OPERATOR","Choose your pilot.","A pathfinder, an automaton, a shadow runner and an aviator. Pick your silhouette.")
 	field("Pilot name",player_name,func(value):player_name=value.left(18);Net.profile.name=player_name;save_settings()).max_length=18
-	for j in range(4):button(PilotArt.NAMES[j]+" / "+PilotArt.ROLES[j],func():selected_character=j;Net.profile.char=j;save_settings();build_ui(),j==selected_character)
+	for j in range(4):button(PilotArt.NAMES[j]+" / "+PilotArt.ROLES[j],func():select_operator(j),j==selected_character)
 	gap(7);label("Identity is saved on this device.",13,Color("a8b594"))
 	button("BACK TO PLAY",func():navigate("menu"))
 
@@ -322,19 +338,23 @@ func if_host() -> void:
 		build_ui()
 
 func online_ui() -> void:
-	title("CONNECT / ONLINE", "Your squad.\nAnywhere.", "Connect to a Skybreak lobby server. Create a room, share a code, or find a match.")
-	field("Lobby server URL",lobby_url,func(v): lobby_url=v;save_settings())
-	button("CONNECT TO LOBBY SERVICE",func(): sync_profile();Lobby.connect_service(lobby_url),not Lobby.connected)
+	title("PLAY TOGETHER", "Build your squad.", "Create a room or join a friend. Your operator travels with you.")
+	var operator_row=HBoxContainer.new();content.add_child(operator_row)
+	var portrait=load("res://scripts/portrait.gd").new();portrait.character=selected_character;portrait.custom_minimum_size=Vector2(76,82);operator_row.add_child(portrait)
+	var identity=VBoxContainer.new();operator_row.add_child(identity)
+	label(PilotArt.NAMES[selected_character],22,PilotArt.COLORS[selected_character],identity)
+	label(PilotArt.ROLES[selected_character],11,Color("aebaa0"),identity)
+	button("CHANGE OPERATOR",func():navigate("character"),false,identity)
 	map_mode_ui()
-	var row=HBoxContainer.new()
-	row.add_theme_constant_override("separation",8)
-	content.add_child(row)
-	var code=field("Room code or invite link",room_code,func(v): room_code=v,row)
-	code.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	var row=HBoxContainer.new();row.add_theme_constant_override("separation",8);content.add_child(row)
+	var code=field("Room code or invite link",room_code,func(v):room_code=v,row);code.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	button("JOIN",join_online,false,row)
-	button("+   CREATE ROOM",func(): Lobby.send_event("create",{"map":selected_map,"mode":selected_mode}),true)
-	button("FIND A MATCH",func(): Lobby.send_event("matchmake",{"map":selected_map,"mode":selected_mode}))
-	button("<   BACK",func(): navigate("menu"))
+	button("CREATE ROOM",func():sync_profile();Lobby.send_event("profile",{"name":player_name,"char":selected_character});Lobby.send_event("create",{"map":selected_map,"mode":selected_mode}),true)
+	button("FIND A MATCH",func():Lobby.send_event("matchmake",{"map":selected_map,"mode":selected_mode}))
+	label("CONNECTION",11,Color("95a78b"))
+	field("Lobby server URL",lobby_url,func(v):lobby_url=v;save_settings())
+	button("RECONNECT" if Lobby.connected else "CONNECT",func():sync_profile();Lobby.connect_service(lobby_url))
+	button("BACK TO PLAY",func():navigate("menu"))
 
 func join_online() -> void:
 	var code=room_code.strip_edges().to_upper()
@@ -360,23 +380,47 @@ func lan_lobby_ui() -> void:
 	chat_ui(Net.chat,func(text): Net.lobby_action("chat",text))
 	button("<   LEAVE ROOM",leave_game)
 
+func pilot_cards(players: Array) -> void:
+	var scroll=ScrollContainer.new();scroll.custom_minimum_size.y=224;scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED;content.add_child(scroll)
+	var grid=GridContainer.new();grid.columns=2;grid.add_theme_constant_override("h_separation",10);grid.add_theme_constant_override("v_separation",10);grid.size_flags_horizontal=Control.SIZE_EXPAND_FILL;scroll.add_child(grid)
+	for p in players:
+		var card=PanelContainer.new();card.custom_minimum_size=Vector2(326,102);card.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+		card.add_theme_stylebox_override("panel",style(Color("202d21"),Color("84ac72") if p.ready else Color("455446"),8));grid.add_child(card)
+		var row=HBoxContainer.new();card.add_child(row)
+		var portrait=load("res://scripts/portrait.gd").new();portrait.character=int(p.char);portrait.custom_minimum_size=Vector2(78,92);row.add_child(portrait)
+		var details=VBoxContainer.new();details.add_theme_constant_override("separation",5);row.add_child(details)
+		label(str(p.name),18,Color("f1e4c7"),details)
+		label(PilotArt.NAMES[int(p.char)],12,PilotArt.COLORS[int(p.char)],details)
+		label(("READY" if p.ready else "NOT READY")+" / "+("AZURE" if p.team==0 else "EMBER") if p.online else "RECONNECTING",11,Color("b5ca9d") if p.ready else Color("94a18b"),details)
+
+func copy_invite(value: String,description: String) -> void:
+	if OS.has_feature("web"):
+		JavaScriptBridge.eval("window.Skybreak.copyInvite("+JSON.stringify(value)+")")
+	else:DisplayServer.clipboard_set(value)
+	toast(description+" copied")
+
 func online_lobby_ui() -> void:
 	var room=Lobby.room
-	title("SQUAD / ONLINE", "ROOM "+str(room.get("code","")),ArenaMaps.NAMES[int(room.get("map",0))]+" / "+("TEAM DEATHMATCH" if int(room.get("mode",0))==1 else "DEATHMATCH"))
-	button("COPY INVITE LINK",func(): DisplayServer.clipboard_set(str(room.get("invite","")));toast("Invite link copied"))
+	title("SQUAD / "+str(room.get("players",[]).size())+" OF 8", "ROOM "+str(room.get("code","")),ArenaMaps.NAMES[int(room.get("map",0))]+" / "+("TEAM DEATHMATCH" if int(room.get("mode",0))==1 else "DEATHMATCH"))
+	if not OS.has_feature("web"):
+		var sharing=HBoxContainer.new();sharing.add_theme_constant_override("separation",10);content.add_child(sharing)
+		button("COPY ROOM CODE",func():copy_invite(str(room.get("code","")),"Room code"),false,sharing).size_flags_horizontal=Control.SIZE_EXPAND_FILL
+		button("COPY INVITE LINK",func():copy_invite(str(room.get("invite","")),"Invite link"),false,sharing).size_flags_horizontal=Control.SIZE_EXPAND_FILL
+
 	var own: Dictionary={}
 	for p in room.get("players",[]):
-		label(("READY / " if p.ready else "-  ")+p.name+"  /  "+("AZURE" if p.team==0 else "EMBER")+(" · offline" if not p.online else ""),17,PilotArt.COLORS[int(p.char)])
-		if p.id==Lobby.player_id: own=p
+		if p.id==Lobby.player_id:own=p
 	if not own.is_empty():
-		choices(["AZURE TEAM","EMBER TEAM"],int(own.team),func(i): Lobby.send_event("team",{"team":i}))
-		button("UNREADY" if own.ready else "READY UP",func(): Lobby.send_event("ready",{"ready":not own.ready}),not own.ready)
-	if room.get("host","")==Lobby.player_id: button("START MATCH   >",func(): Lobby.send_event("start"),true)
-	label("SERVER: "+str(room.get("phase","lobby")).to_upper(),12,Color("7fd3c1"))
+		var actions=HBoxContainer.new();actions.add_theme_constant_override("separation",10);content.add_child(actions)
+		choices(["AZURE TEAM","EMBER TEAM"],int(own.team),func(i):Lobby.send_event("team",{"team":i}),actions).size_flags_horizontal=Control.SIZE_EXPAND_FILL
+		button("UNREADY" if own.ready else "READY UP",func():Lobby.send_event("ready",{"ready":not own.ready}),not own.ready,actions).size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	if room.get("host","")==Lobby.player_id:button("START MATCH",func():Lobby.send_event("start"),true)
+	label("PILOTS / "+str(room.get("phase","lobby")).to_upper(),12,Color("a1c9ac"))
+	pilot_cards(room.get("players",[]))
 	var lines: Array=[]
-	for item in room.get("chat",[]): lines.append(item.name+": "+item.text)
-	chat_ui(lines,func(text): Lobby.send_event("chat",{"text":text}))
-	button("<   LEAVE ROOM",leave_game)
+	for line in room.get("chat",[]):lines.append(str(line.name)+": "+str(line.text))
+	chat_ui(lines,func(text):Lobby.send_event("chat",{"text":text}))
+	button("LEAVE ROOM",leave_game)
 
 func chat_ui(lines: Array,send: Callable) -> void:
 	var base=Panel.new();base.position=Vector2(812,270);base.size=Vector2(568,488)
@@ -389,9 +433,9 @@ func chat_ui(lines: Array,send: Callable) -> void:
 	for line in lines.slice(maxi(0,lines.size()-12)):
 		var item=label(str(line),14,Color("b8c6a5"),messages);item.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	var row=HBoxContainer.new();row.add_theme_constant_override("separation",8);chat_box.add_child(row)
-	var edit=field("Message your squad...","",func(_value):pass,row);edit.max_length=160;edit.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	var edit=field("Message your squad...",chat_draft,func(value):chat_draft=value,row);chat_entry=edit;edit.max_length=160;edit.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	var submit=func():
-		if not edit.text.strip_edges().is_empty():send.call(edit.text);edit.text=""
+		if not edit.text.strip_edges().is_empty():send.call(edit.text);chat_draft="";edit.text=""
 	edit.text_submitted.connect(func(_value):submit.call());button("SEND",submit,false,row)
 
 func settings_ui() -> void:
@@ -407,7 +451,7 @@ func settings_ui() -> void:
 	button("TOGGLE FULLSCREEN",func(): fullscreen=not fullscreen;DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN if fullscreen else DisplayServer.WINDOW_MODE_WINDOWED))
 	gap()
 	label("FLIGHT MANUAL",14,Color("b8ef70"))
-	label("A / D or ← / →     Move\nSpace                      Jump\nW / ↑ or right mouse    Jetpack\nMouse / left mouse      Aim / shoot\n1 - 6                         Switch weapon\nR                              Reload\nE                              Pick up weapon\nQ                              Change grenade\nG                              Throw grenade\nTab                           Scoreboard\nEscape                      Match menu",17,Color("a1b7c3"))
+	label("A / D or ← / →     Move\nSpace                      Jump\nW / ↑ or right mouse    Jetpack\nMouse / left mouse      Aim / shoot\n1 - 6                         Switch weapon\nR                              Reload\nE                              Pick up weapon\nQ                              Change grenade\nS / ↓ / Ctrl                 Crouch / crawl\nG                              Throw grenade\nTab                           Scoreboard\nEscape                      Match menu",17,Color("a1b7c3"))
 	gap()
 	button("<   BACK",func(): navigate("menu"))
 
@@ -439,6 +483,7 @@ func retry_connection() -> void:
 	else: leave_game()
 
 func leave_game() -> void:
+	chat_draft=""
 	Net.stop()
 	if not Lobby.room.is_empty(): Lobby.send_event("leave")
 	Lobby.disconnect_service()
@@ -480,6 +525,7 @@ func _physics_process(_delta: float) -> void:
 func _process(_delta: float) -> void:
 	if OS.has_feature("web") and Net.now()>browser_report_at:
 		browser_report_at=Net.now()+1
+		view.detail_scale=clampf(float(JavaScriptBridge.eval("window.Skybreak.detail()")),0.6,1.0)
 		var report=connection_report()
 		report["fps"]=Engine.get_frames_per_second()
 		JavaScriptBridge.eval("window.Skybreak.update("+JSON.stringify(report)+")")
@@ -518,8 +564,8 @@ func capture(path: String) -> void:
 
 func connection_report() -> Dictionary:
 	var players: Array=[]
-	for p in Net.state.get("players",{}).values(): players.append({"id":p.id,"name":p.name,"position":[p.p.x,p.p.y],"hp":p.hp,"ammo":p.ammo,"kills":p.kills,"deaths":p.deaths,"seq":p.seq,"online":p.online})
-	var report={"local_id":Net.local_id,"phase":Net.state.get("phase",""),"metrics":Net.metrics,"players":players,"ping_ms":Net.ping_ms,"status":Net.status,"time":Net.state.get("time",0),"discovered":Net.discovered,"lobby_status":Lobby.status,"room":Lobby.room.get("code",""),"screen":screen,"transport":Net.transport,"map":Net.map_id}
+	for p in Net.state.get("players",{}).values(): players.append({"id":p.id,"name":p.name,"character":p.char,"position":[p.p.x,p.p.y],"hp":p.hp,"ammo":p.ammo,"kills":p.kills,"deaths":p.deaths,"seq":p.seq,"online":p.online,"crouched":p.get("crouched",false)})
+	var report={"local_id":Net.local_id,"phase":Net.state.get("phase",""),"metrics":Net.metrics,"players":players,"ping_ms":Net.ping_ms,"status":Net.status,"time":Net.state.get("time",0),"discovered":Net.discovered,"lobby_status":Lobby.status,"room":Lobby.room.get("code",""),"invite_url":Lobby.room.get("invite",""),"room_players":Lobby.room.get("players",[]),"screen":screen,"transport":Net.transport,"map":Net.map_id}
 	return report
 
 func write_report() -> void:

@@ -25,7 +25,7 @@ Render supplies `PORT` and `RENDER_EXTERNAL_URL`. The server uses that external 
 
 The Node service proxies the WebSocket handshake and binary frames to the room's Godot process on loopback. It validates browser origins, bounds connections and does not forward cookies or HTTP authorization to the game process. The Godot server separately validates its unique per-player match ticket before sending any state.
 
-Wait for a healthy deployment. `GET https://YOUR_RENDER_HOST/health` must return `ok:true`, `protocol:2`, and `transport:"websocket"`.
+Wait for a healthy deployment. `GET https://YOUR_RENDER_HOST/health` must return `ok:true`, `protocol:3`, and `transport:"websocket"`.
 
 ## 3. Deploy the website to Vercel
 
@@ -69,3 +69,5 @@ WEB_URL=https://YOUR_WEBSITE_ORIGIN \
 ```
 
 Terminate HTTPS/WSS using an existing reverse proxy and proxy upgrade requests to Node port 3000. No additional publicly exposed game port is needed in WebSocket mode. For native ENet-only hosting, choose `GAME_TRANSPORT=enet`, set `PUBLIC_GAME_HOST`, and expose UDP 29500–29507. The same authoritative simulation is used in either case.
+
+Version 1.3 adds a posture field to snapshots and a protocol check to lobby authentication. Deploy the Render server and Vercel client together, then refresh existing browser tabs. Older cached clients receive a refresh/update message instead of joining an incompatible match.

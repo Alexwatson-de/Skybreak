@@ -16,10 +16,10 @@ const GRENADE_NAMES=["FRAG","IMPACT","INCENDIARY"]
 const GRENADE_FUSE=[1.8,2.4,2.0]
 
 static func player(id: int,name_tag: String,team: int,character: int,spawn: Vector2) -> Dictionary:
-	return {"id":id,"name":name_tag.left(18),"team":team,"char":character,"p":spawn,"v":Vector2.ZERO,"hp":100,"fuel":100.0,"ammo":[12,0,0,0,0,0],"reserve":[72,0,0,0,0,0],"owned":[true,false,false,false,false,false],"weapon":0,"grenade_ammo":[2,0,0],"grenade_type":0,"grenades":2,"cool":0.0,"reload":0.0,"dead":0.0,"shield":2.2,"kills":0,"deaths":0,"score":0,"seq":0,"aim":0.0,"ground":false,"jet":false,"online":true,"last_g":false,"last_jump":false,"last_pick":false,"grenade_cd":0.0}
+	return {"id":id,"name":name_tag.left(18),"team":team,"char":character,"p":spawn,"v":Vector2.ZERO,"hp":100,"fuel":100.0,"ammo":[12,0,0,0,0,0],"reserve":[72,0,0,0,0,0],"owned":[true,false,false,false,false,false],"weapon":0,"grenade_ammo":[2,0,0],"grenade_type":0,"grenades":2,"cool":0.0,"reload":0.0,"dead":0.0,"shield":2.2,"kills":0,"deaths":0,"score":0,"seq":0,"aim":0.0,"ground":false,"crouched":false,"jet":false,"online":true,"last_g":false,"last_jump":false,"last_pick":false,"grenade_cd":0.0}
 
 static func blank() -> Dictionary:
-	return {"x":0.0,"jump":false,"jet":false,"fire":false,"grenade":false,"reload":false,"interact":false,"aim":0.0,"weapon":-1,"grenade_type":0,"seq":0,"time":0.0}
+	return {"x":0.0,"jump":false,"crouch":false,"jet":false,"fire":false,"grenade":false,"reload":false,"interact":false,"aim":0.0,"weapon":-1,"grenade_type":0,"seq":0,"time":0.0}
 
 static func collision_shape(value: Variant) -> Dictionary:
 	if value is Dictionary:return value
@@ -57,11 +57,22 @@ static func nearby_shapes(platforms: Array,grid: Dictionary,bounds: Rect2) -> Ar
 static func move(p: Dictionary,input: Dictionary,platforms: Array,dt: float,grid: Dictionary={}) -> void:
 	if p.hp<=0:return
 	var v: Vector2=p.v;var pos: Vector2=p.p
-	v.x=move_toward(v.x,float(input.get("x",0))*SPEED,(2200.0 if p.ground else 1350.0)*dt)
+	var crouched=bool(p.get("crouched",false))
+	if input.get("crouch",false) and not crouched:
+		pos.y+=11;crouched=true
+	elif not input.get("crouch",false) and crouched:
+		var standing=pos-Vector2(0,11)
+		var clear=true
+		for shape in nearby_shapes(platforms,grid,Rect2(standing-Vector2(15,25),Vector2(30,50))):
+			if penetration(standing,Vector2(15,25),shape).length_squared()>0.000001:clear=false;break
+		if clear:pos=standing;crouched=false
+	p.crouched=crouched
+	var half=Vector2(15,14 if crouched else 25)
+	v.x=move_toward(v.x,float(input.get("x",0))*(115.0 if crouched else SPEED),(2200.0 if p.ground else 1350.0)*dt)
 	var jump=bool(input.get("jump",false))
-	if jump and not p.last_jump and p.ground:v.y=JUMP
+	if jump and not p.last_jump and p.ground and not crouched:v.y=JUMP
 	p.last_jump=jump
-	p.jet=bool(input.get("jet",false)) and p.fuel>0
+	p.jet=bool(input.get("jet",false)) and p.fuel>0 and not crouched
 	if p.jet:
 		v.y=maxf(v.y-1900.0*dt,-420.0);p.fuel=maxf(0,p.fuel-29*dt)
 	else:p.fuel=minf(100,p.fuel+(22 if p.ground else 10)*dt)
@@ -71,19 +82,19 @@ static func move(p: Dictionary,input: Dictionary,platforms: Array,dt: float,grid
 		pos+=v*dt*0.5
 		for iteration in range(3):
 			var moved=false
-			var bounds=Rect2(pos-Vector2(15,25),Vector2(30,50))
+			var bounds=Rect2(pos-half,half*2)
 			for shape in nearby_shapes(platforms,grid,bounds):
 				if shape is Dictionary and not bounds.intersects(shape.bounds):continue
-				var correction=penetration(pos,Vector2(15,25),shape)
+				var correction=penetration(pos,half,shape)
 				if correction.length_squared()<0.000001:continue
 				var normal=correction.normalized()
 				pos+=correction+normal*0.002
-				bounds.position=pos-Vector2(15,25)
+				bounds.position=pos-half
 				if normal.y< -0.55:p.ground=true
 				if v.dot(normal)<0:v-=normal*v.dot(normal)
 				moved=true
 			if not moved:break
-	pos.x=clampf(pos.x,20,ArenaMaps.WIDTH-20);pos.y=maxf(28,pos.y)
+	pos.x=clampf(pos.x,20,ArenaMaps.WIDTH-20);pos.y=maxf(half.y+3,pos.y)
 	p.p=pos;p.v=v;p.aim=float(input.get("aim",p.aim))
 
 static func wall_distance(origin: Vector2,direction: Vector2,distance: float,platforms: Array) -> float:
@@ -105,11 +116,12 @@ static func wall_distance(origin: Vector2,direction: Vector2,distance: float,pla
 		if hi>=lo and hi>=0:best=minf(best,lo)
 	return best
 
-static func ray_player(origin: Vector2,direction: Vector2,center: Vector2) -> float:
+static func ray_player(origin: Vector2,direction: Vector2,center: Vector2,crouched: bool=false) -> float:
 	var delta=center-origin;var along=delta.dot(direction)
 	var d=delta.length_squared()-along*along
-	if d>26*26:return INF
-	var hit=along-sqrt(maxf(0,26*26-d))
+	var radius=16.0 if crouched else 26.0
+	if d>radius*radius:return INF
+	var hit=along-sqrt(maxf(0,radius*radius-d))
 	return hit if hit>=0 else INF
 
 static func hurt(state: Dictionary,victim: int,attacker: int,amount: int,events: Array) -> void:
@@ -164,7 +176,7 @@ static func tick(state: Dictionary,inputs: Dictionary,history: Array,arena_overr
 		elif (input.get("reload",false) or p.ammo[weapon]==0) and p.ammo[weapon]<CLIP[weapon] and p.reserve[weapon]>0:p.reload=RELOAD[weapon]
 		if input.get("fire",false) and p.cool<=0 and p.reload<=0 and p.ammo[weapon]>0:
 			p.ammo[weapon]-=1;p.cool=COOLDOWN[weapon];p.shield=0.0
-			var origin=p.p+Vector2(0,-5)
+			var origin=p.p+Vector2(0,5 if p.get("crouched",false) else -5)
 			var lag=clampf(state.time-float(input.get("time",state.time)),0,0.18)
 			var rewind: Dictionary={}
 			for frame in history:
@@ -176,14 +188,14 @@ static func tick(state: Dictionary,inputs: Dictionary,history: Array,arena_overr
 				for other_id in state.players:
 					var other=state.players[other_id]
 					if other_id==id or other.hp<=0 or not other.online or (state.mode==1 and other.team==p.team):continue
-					var hit=ray_player(origin,direction,rewind.get(other_id,other.p))
+					var hit=ray_player(origin,direction,rewind.get(other_id,other.p),other.get("crouched",false))
 					if hit<length:length=hit;target_id=other_id
 				if target_id!=-1:hurt(state,target_id,id,DAMAGE[weapon],events)
 				events.append({"kind":"shot","from":origin,"to":origin+direction*length,"by":id,"weapon":weapon})
 		var g=bool(input.get("grenade",false))
 		if g and not p.last_g and p.grenades>0 and p.grenade_cd<=0 and state.grenades.size()<32:
 			p.grenade_ammo[p.grenade_type]-=1;p.grenades=p.grenade_ammo[p.grenade_type];p.grenade_cd=0.6
-			state.grenades.append({"p":p.p+Vector2(0,-30),"v":Vector2.from_angle(p.aim)*630+Vector2(0,-120),"life":GRENADE_FUSE[p.grenade_type],"by":id,"type":p.grenade_type,"burn":false,"pulse":0.0})
+			state.grenades.append({"p":p.p+Vector2(0,-8 if p.get("crouched",false) else -30),"v":Vector2.from_angle(p.aim)*630+Vector2(0,-120),"life":GRENADE_FUSE[p.grenade_type],"by":id,"type":p.grenade_type,"burn":false,"pulse":0.0})
 		p.last_g=g
 		# E is an intention; the authority checks actual distance, availability and cover.
 		var pick=bool(input.get("interact",false))

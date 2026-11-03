@@ -12,7 +12,7 @@ const url=process.env.TEST_LOBBY_URL || 'http://127.0.0.1:3017';
 const root=resolve('..');
 const godot=process.env.GODOT_BIN || resolve(root,'.runtime/Godot.app/Contents/MacOS/Godot');
 function event(s:Socket,name:string,predicate:(d:any)=>boolean=()=>true,timeout=16000):Promise<any>{return new Promise((done,reject)=>{const timer=setTimeout(()=>{s.off(name,on);reject(Error(`Timed out waiting for ${name}`));},timeout);const on=(d:any)=>{if(predicate(d)){clearTimeout(timer);s.off(name,on);done(d);}};s.on(name,on);});}
-async function connect(name:string,session?:string){const s=io(url,{transports:['websocket'],autoConnect:false,auth:{name,char:1,session},reconnection:false});const ready=event(s,'session');s.connect();return {socket:s,session:await ready};}
+async function connect(name:string,session?:string){const s=io(url,{transports:['websocket'],autoConnect:false,auth:{name,char:1,session,protocol:3},reconnection:false});const ready=event(s,'session');s.connect();return {socket:s,session:await ready};}
 const delay=(ms:number)=>new Promise(r=>setTimeout(r,ms));
 function client(args:string[],log:string){const binary=process.env.CLIENT_BIN||godot;const runtimeArgs=process.env.CLIENT_BIN?['--headless']:['--headless','--path',resolve(root,'game')];const p=spawn(binary,[...runtimeArgs,'--',...args],{stdio:['ignore','pipe','pipe']});let out='';p.stdout?.on('data',d=>out+=d);p.stderr?.on('data',d=>out+=d);const result=new Promise<number|null>((done)=>p.on('exit',async(code)=>{await writeFile(log,out);done(code);}));return {p,result};}
 test(`real lobby → ready checks → dedicated ${process.env.GAME_TRANSPORT || 'enet'} → two native clients → reconnect`, {timeout:remote?150000:65000},async()=>{
@@ -21,7 +21,7 @@ test(`real lobby → ready checks → dedicated ${process.env.GAME_TRANSPORT || 
  const sockets:Socket[]=[];const processes:ChildProcess[]=[];const dir=await mkdtemp(resolve(tmpdir(),'skybreak-test-'));
  try{
   for(let i=0;i<(remote?700:80);i++){try{if((await fetch(url+'/health')).ok)break;}catch{}await delay(100);}
-  const health=await (await fetch(url+'/health')).json();assert.equal(health.protocol,2);
+  const health=await (await fetch(url+'/health')).json();assert.equal(health.protocol,3);
   async function upgradeStatus(path:string,origin=process.env.TEST_WEB_ORIGIN || 'http://127.0.0.1:8123') {
     return new Promise<number>((done,reject)=>{
       const req=(url.startsWith('https:')?requestHttps:request)(url+path,{headers:{Connection:'Upgrade',Upgrade:'websocket','Sec-WebSocket-Version':'13','Sec-WebSocket-Key':'dGhlIHNhbXBsZSBub25jZQ==',Origin:origin}},res=>{res.resume();done(res.statusCode!);});
@@ -35,6 +35,7 @@ test(`real lobby → ready checks → dedicated ${process.env.GAME_TRANSPORT || 
   let roomEvent=event(a.socket,'room');a.socket.emit('create',{map:0,mode:1});let room=await roomEvent;
   assert.match(room.code,/^[A-Z2-9]{6}$/);assert.match(room.invite,/room=/);
   const joined=event(a.socket,'room',r=>r.players.length===2);b.socket.emit('join',{code:room.code});room=await joined;
+  const identity=event(a.socket,'room',r=>r.players.some((p:any)=>p.name==='Bravo'&&p.char===2));b.socket.emit('profile',{name:'Bravo',char:2});await identity;
   const chat=event(b.socket,'room',r=>r.chat.at(-1)?.text==='Ready to fly');a.socket.emit('chat',{text:'Ready to fly'});await chat;
   const forbidden=event(b.socket,'error_message');b.socket.emit('start',{});assert.match((await forbidden).message,/host/);
   const notReady=event(a.socket,'error_message');a.socket.emit('start',{});assert.match((await notReady).message,/ready/);

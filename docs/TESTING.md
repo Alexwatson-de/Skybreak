@@ -1,4 +1,4 @@
-# Verification scope, 1.2
+# Verification scope, 1.3
 
 Tests run with Godot 4.5.1 and Node.js. Test clients are separate native processes using real ENet or WebSocket connections. Browser checks use the actual Godot web export, not a recreated game or UI mockup.
 
@@ -36,3 +36,13 @@ Production verification on 2026-11-03: Vercel and Render both deployed `e00baad`
 Spatial indexing preserved the previous collision trajectories on all three maps. A 3,000-step native movement benchmark took 500,883 µs without indexing and 122,289 µs with indexing (about 4.1× faster). Two simultaneous browser clients on the test machine improved from roughly 6–7 FPS to 15 FPS, still below a smooth 60 FPS target. These measurements do not certify performance on other devices. Sanitized live evidence and the actual browser screenshot are in `live-online-test-evidence.json`, `live-browser-test-evidence.json` and `live-browser-match.png`.
 
 Keyboard/mouse only; no mobile touch, persistent accounts, host migration or cross-region matchmaking. Render Free can cold-start after inactivity and loses in-memory sessions on restart. No guarantee of zero lag or unlimited free hosting is made. Physical multi-device, adverse Internet packet-loss, long soak and recipient-Mac checks require their actual environments. Docker/Linux build verification is supplied by the CI/hosting run rather than inferred from macOS tests.
+
+## 1.3 local verification
+
+- 72 simulation checks passed, including six map spawn/loot checks, crouch passage traversal, blocked standing, preserved foot contact and the reduced crouch bullet target.
+- Seven prediction checks passed: immediate cosmetic feedback, weapon cadence, empty/dead-player rejection and authoritative acknowledgement; prediction cannot change server ammo or damage.
+- ENet and WebSocket lobby → two native clients → combat → reconnection tests passed. The WebSocket run recorded 13 hits and 2 kills. Operator identity changes were verified through the lobby server.
+- Eight real WebSocket clients passed on every map (six maps); the largest compressed snapshot was 930 bytes. The observation interval was extended to 12 seconds so the loaded test machine had time to process enough snapshots without reducing the required snapshot count.
+- Browser UI review confirmed distinct operator silhouettes, six map cards, crouch state and a separate lower HUD band. Final public-cloud evidence is recorded separately in the live evidence files.
+
+Weapon audio is six processed variants of one credited Pixabay gun recording, not six unrelated stock recordings. The recording was trimmed, pitch-shifted, filtered, equalized and given different envelopes/echo per weapon. License and attribution are in `licenses/PIXABAY-AUDIO.md`.

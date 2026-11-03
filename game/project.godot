@@ -3,7 +3,7 @@ config_version=5
 
 [application]
 config/name="Skybreak Arena"
-config/version="1.2.0"
+config/version="1.3.0"
 config/use_custom_user_dir=true
 config/custom_user_dir_name="Skybreak Arena"
 run/main_scene="res://main.tscn"

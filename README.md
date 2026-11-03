@@ -1,6 +1,6 @@
-# Skybreak Arena 1.2 — browser multiplayer
+# Skybreak Arena 1.3 — browser multiplayer
 
-An original Godot 4.5.1 jetpack arena shooter with a browser client, native LAN play, and authoritative online matches. Three underground maps, six guns, three grenade types, deathmatch and team deathmatch. No purchases, ads, subscriptions, analytics SDK, or Firebase dependency.
+An original Godot 4.5.1 jetpack arena shooter with a browser client, native LAN play, and authoritative online matches. Six arenas, four distinct operators, six guns, three grenade types, deathmatch and team deathmatch. No purchases, ads, subscriptions, analytics SDK, or Firebase dependency.
 
 ## Play in a browser
 
@@ -8,7 +8,7 @@ Live game: **https://skybreak-zeta.vercel.app/**. Source: [Alexwatson-de/Skybrea
 
 The website runs the actual Godot game. Choose **Play Online**, create a room or join a code/invite, chat, choose teams, ready up, and let the host start. Practice against three bots is also available. A keyboard and mouse are required; mobile touch controls have not been implemented.
 
-Graphics default to Auto, which adjusts resolution during a slow match. Use **Connection details → Graphics quality** to choose Low for faster rendering or High for sharper graphics. This setting is saved in your browser and does not change movement, collision, weapons or server validation.
+The interface stays at native display resolution. **Connection details → Graphics quality** adjusts the terrain detail without downscaling labels, avatars or the HUD. Auto reduces world detail during slower matches; Low and High are also available.
 
 Vercel serves the browser client. A Render **Free** Docker service runs the Node.js/TypeScript/Socket.IO lobby and a dedicated Godot process per match. Browser and current native online clients use WebSocket/WSS through the same public HTTPS port. Native Wi-Fi/hotspot hosting continues to use ENet. All modes share `game/scripts/sim.gd`; no game rules are reimplemented in the website.
 
@@ -20,6 +20,7 @@ Free Render hosting sleeps after 15 minutes without traffic. The first connectio
 |---|---|
 | Move | A / D or left / right arrows |
 | Jump | Space |
+| Crouch / crawl | Hold S, down arrow or Ctrl; move with A / D |
 | Jetpack | W / up arrow / right mouse |
 | Aim / fire | Mouse / left mouse |
 | Collect a nearby gun | E |
@@ -30,7 +31,13 @@ Free Render hosting sleeps after 15 minutes without traffic. The first connectio
 
 Start with the Sable pistol. Find Kestrel AR, Breach Shotgun, Needle SMG, Longshot DMR and Volt Carbine racks. The server validates pickup distance, line of cover, ownership, ammunition, damage, kills and scores. Racks regenerate after 18 seconds. Frag grenades bounce on a timer; impact grenades detonate on terrain; incendiaries create a brief damaging fire patch. Death resets equipment; respawn takes three seconds. Team damage is disabled.
 
-The Hollow, Rootbound Ruins and Ember Quarry include irregular earth masses, slopes, masonry arches, underground chambers, roots, grass, lanterns and mine supports. All characters, map layouts, weapon drawings, grenade illustrations and sounds are original.
+Catacombs, Outpost, Pyramid and So Long are reference-inspired arenas alongside Rootbound Ruins and Ember Quarry. These are original layouts and drawings, not exact replicas of Mini Militia maps. Low passages require crouching; the authority prevents standing under a ceiling and applies the reduced movement speed and hit target.
+
+Wren is a hooded pathfinder, Rivet an armored automaton, Vesper a masked runner with a cape, and Kite a goggle-wearing aviator. Lobby cards show each player's operator, team and readiness. Browser room-code and invite-link buttons use real browser click events for clipboard access.
+
+Local firing feedback and ammunition previews appear immediately. Authoritative acknowledgements reconcile them; only the server can apply damage, kills and scores. Snapshot reconciliation coalesces bursts into one replay per physics frame. The camera reserves a lower HUD strip so grounded players remain above the inventory and ammunition panels.
+
+Each weapon has a separately processed sound derived from a credited Pixabay recording. See [audio attribution and license](docs/licenses/PIXABAY-AUDIO.md). Explosions, jetpack and hit cues remain synthesized.
 
 ## Run locally
 
@@ -84,4 +91,4 @@ bash scripts/build_web.sh
 
 The server runs fixed simulation ticks, bounded hitscan rewind, client prediction and replay, remote interpolation, bounded snapshot queues, smooth small corrections, and reconnection. Server-side validation limits cheating; this is an indie game rather than a production-scale account/anti-cheat platform. No public Internet latency, live deployment, or platform test should be claimed without actual evidence.
 
-Source and original assets are MIT licensed. See [third-party notices](THIRD_PARTY.md). No Mini Militia maps, characters, assets or code are included.
+Source and original assets are MIT licensed; Pixabay-derived weapon audio has its separate Content License. See [third-party notices](THIRD_PARTY.md). No Mini Militia artwork or code is included.

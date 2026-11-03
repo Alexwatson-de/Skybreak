@@ -24,6 +24,8 @@ jobs:
         run: bash scripts/build_web.sh
       - name: Verify authoritative simulation
         run: .runtime/Godot_v4.5.1-stable_linux.x86_64 --headless --path game --script tests/simulation_test.gd
+      - name: Verify immediate firing feedback remains cosmetic
+        run: .runtime/Godot_v4.5.1-stable_linux.x86_64 --headless --path game --script tests/prediction_test.gd
       - name: Build lobby
         run: npm ci && npm run build
         working-directory: backend

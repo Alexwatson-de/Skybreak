@@ -31,7 +31,7 @@ const basePort = Number(process.env.GAME_PORT_BASE || 29500);
 const maxRooms = Math.min(32, Number(process.env.MAX_ROOMS || 8));
 const nameSchema = z.string().trim().min(1).max(18).regex(/^[\p{L}\p{N} _.-]+$/u);
 const codeSchema = z.object({code:z.string().toUpperCase().regex(/^[A-Z2-9]{6}$/)});
-const configSchema = z.object({map:z.number().int().min(0).max(2),mode:z.number().int().min(0).max(1)});
+const configSchema = z.object({map:z.number().int().min(0).max(5),mode:z.number().int().min(0).max(1)});
 interface Pilot { id:string; token:string; name:string; char:number; team:number; ready:boolean; socket?:string; disconnectedAt?:number; }
 interface Room { code:string; host:string; map:number; mode:number; players:string[]; chat:{name:string;text:string}[]; phase:'lobby'|'starting'|'match'; process?:ChildProcess; port?:number; tickets?:Record<string,string>; createdAt:number; }
 const pilots = new Map<string,Pilot>();
@@ -39,7 +39,7 @@ const rooms = new Map<string,Room>();
 const usedPorts = new Set<number>();
 const ipConnections = new Map<string,number>();
 const http = createServer((req,res)=>{
-  if(req.url==='/health') { res.setHeader('Content-Type','application/json'); res.setHeader('Cache-Control','no-store'); if(originAllowed(req.headers.origin)&&req.headers.origin)res.setHeader('Access-Control-Allow-Origin',req.headers.origin); res.end(JSON.stringify({ok:true,rooms:rooms.size,protocol:2,version:'1.2.0',transport:gameTransport})); return; }
+  if(req.url==='/health') { res.setHeader('Content-Type','application/json'); res.setHeader('Cache-Control','no-store'); if(originAllowed(req.headers.origin)&&req.headers.origin)res.setHeader('Access-Control-Allow-Origin',req.headers.origin); res.end(JSON.stringify({ok:true,rooms:rooms.size,protocol:3,version:'1.3.0',transport:gameTransport})); return; }
   if(req.url?.startsWith('/join?')) {
     const code=new URL(req.url,publicUrl).searchParams.get('room')||'';
     if(webUrl && /^[A-Z2-9]{6}$/.test(code)) { res.writeHead(302,{Location:`${webUrl}/?room=${code}`});res.end();return; }
@@ -111,6 +111,7 @@ io.use((socket,next)=>{
   const ip=socket.handshake.address;const count=ipConnections.get(ip)||0;
   if(count>=32)return next(Error('Connection capacity reached'));
   const auth=socket.handshake.auth||{};
+  if(auth.protocol!==3)return next(Error('Game updated: refresh the website or install version 1.3'));
   let p=typeof auth.session==='string'?[...pilots.values()].find(x=>tokenEqual(x.token,auth.session)):undefined;
   if(p?.socket&&io.sockets.sockets.has(p.socket))return next(Error('Session already connected'));
   if(!p){
@@ -130,6 +131,7 @@ io.on('connection',socket=>{
     const parsed=schema.safeParse(raw);if(!parsed.success){fail(socket,'Invalid request');return;}
     try{await run(parsed.data);}catch(e){fail(socket,e instanceof Error?e.message:'Request failed');}
   });}
+  on('profile',z.object({name:nameSchema,char:z.number().int().min(0).max(3)}),d=>{const r=roomFor(p.id);if(r&&r.phase!=='lobby')throw Error('Operator is locked during a match');p.name=d.name;p.char=d.char;p.ready=false;if(r)broadcast(r);});
   on('create',configSchema,d=>createRoom(p,d.map,d.mode));
   on('join',codeSchema,d=>{const r=rooms.get(d.code);if(!r)throw Error('Room not found');if(r.players.includes(p.id)){broadcast(r);return;}joinRoom(p,r);});
   on('matchmake',configSchema,d=>{if(roomFor(p.id))throw Error('Leave your room first');const r=[...rooms.values()].find(r=>r.phase==='lobby'&&r.mode===d.mode&&r.map===d.map&&r.players.length<8);return r?joinRoom(p,r):createRoom(p,d.map,d.mode);});

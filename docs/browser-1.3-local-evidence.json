@@ -1,0 +1,153 @@
+{
+  "date": "2026-11-03T06:55:05.036Z",
+  "scope": "local browser integration",
+  "checks": [
+    "clipboard room code",
+    "clipboard invite URL",
+    "different synchronized avatars",
+    "two-player outpost match",
+    "crouch",
+    "shots and ammunition",
+    "HUD clearance"
+  ],
+  "alpha": {
+    "discovered": {},
+    "fps": 19,
+    "invite_url": "http://127.0.0.1:8123/?room=LYHTGU",
+    "lobby_status": "CONNECTED · LOBBY",
+    "local_id": 1,
+    "map": 3,
+    "metrics": {
+      "hits": 0,
+      "kills": 0,
+      "max_snapshot_bytes": 0,
+      "reconnects": 0,
+      "rejected": 0,
+      "shots": 6,
+      "snapshots": 2253
+    },
+    "phase": "match",
+    "ping_ms": 96,
+    "players": [
+      {
+        "ammo": [
+          12,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "crouched": false,
+        "deaths": 0,
+        "hp": 100,
+        "id": 1,
+        "kills": 0,
+        "name": "SquadHost",
+        "online": true,
+        "position": [
+          310.942596435547,
+          499.059234619141
+        ],
+        "seq": 6756
+      },
+      {
+        "ammo": [
+          6,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "crouched": true,
+        "deaths": 0,
+        "hp": 100,
+        "id": 2,
+        "kills": 0,
+        "name": "Wingmate",
+        "online": true,
+        "position": [
+          2895.626953125,
+          619.494750976562
+        ],
+        "seq": 6722
+      }
+    ],
+    "room": "LYHTGU",
+    "screen": "game",
+    "status": "CONNECTED · ONLINE",
+    "time": 112.899999999995,
+    "transport": "websocket"
+  },
+  "bravo": {
+    "discovered": {},
+    "fps": 21,
+    "invite_url": "http://127.0.0.1:8123/?room=LYHTGU",
+    "lobby_status": "CONNECTED · LOBBY",
+    "local_id": 2,
+    "map": 3,
+    "metrics": {
+      "hits": 0,
+      "kills": 0,
+      "max_snapshot_bytes": 0,
+      "reconnects": 0,
+      "rejected": 0,
+      "shots": 6,
+      "snapshots": 2260
+    },
+    "phase": "match",
+    "ping_ms": 88,
+    "players": [
+      {
+        "ammo": [
+          12,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "crouched": false,
+        "deaths": 0,
+        "hp": 100,
+        "id": 1,
+        "kills": 0,
+        "name": "SquadHost",
+        "online": true,
+        "position": [
+          310.924560546875,
+          499.060607910156
+        ],
+        "seq": 6781
+      },
+      {
+        "ammo": [
+          6,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "crouched": true,
+        "deaths": 0,
+        "hp": 100,
+        "id": 2,
+        "kills": 0,
+        "name": "Wingmate",
+        "online": true,
+        "position": [
+          2895.626953125,
+          619.494750976562
+        ],
+        "seq": 6748
+      }
+    ],
+    "room": "LYHTGU",
+    "screen": "game",
+    "status": "CONNECTED · ONLINE",
+    "time": 113.349999999995,
+    "transport": "websocket"
+  }
+}

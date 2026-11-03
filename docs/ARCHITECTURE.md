@@ -49,10 +49,18 @@ The included supervisor is for one trusted host with bounded rooms/processes. In
 
 `maps.gd` caches the original polygon terrain and decomposes it into convex collision pieces. Shared SAT overlap resolution handles player and grenade collision; ray/convex-slab intersections provide weapon and explosion cover checks. Rendered outlines follow the same terrain. A cached free-space A* grid guides bots through the chambers; it does not replace player physics.
 
-Gun ownership, per-type grenade stock and active grenade selection are included in compact snapshots. Pickup timers identify entries in the shared static map loot table. Weapon pickup is an edge-triggered E intention; health/grenade supplies are proximity-triggered. The host authenticates protocol version 2 before admitting a client, so 1.0 clients cannot silently use the wrong terrain or inventory codec.
+Gun ownership, per-type grenade stock and active grenade selection are included in compact snapshots. Pickup timers identify entries in the shared static map loot table. Weapon pickup is an edge-triggered E intention; health/grenade supplies are proximity-triggered. The host authenticates protocol version 3 before admitting a client, so older clients cannot silently use the wrong terrain or inventory codec.
 
 The static terrain is rasterized once into a single texture for the active map, so camera motion does not replay thousands of dirt, brick and grass draw commands. The previous map texture is released when switching maps. Collision/cover still use the original polygons; cheap bounding-box rejection avoids unnecessary polygon work. Headless processes do not construct or draw this layer, equipment art or menu controls, and cap their process loop at 60 FPS while retaining the shared fixed simulation tick.
 
 ## Browser lifecycle
 
 The responsive shell caps rendering pixel density to reduce GPU work, serves a pre-compressed engine binary on Vercel, and shows download, wake-up and reconnect status. Match diagnostics are DOM-visible and omit authentication material. A browser tab keeps its lobby recovery token in origin-scoped sessionStorage, so tabs have separate sessions and a reload can recover while the server still holds its slot. Production exports disable development auto-play arguments.
+
+## Crouching, feedback and clear rendering (1.3)
+
+The crouch intention is sanitized alongside other input flags. Shared movement changes the collider from 30×50 to 30×28 while retaining its foot position, limits crawling speed, disables jumping/thrust while crouched and checks clearance before standing. The snapshot codec includes the resulting posture; bullet targets and grenade origins follow that posture.
+
+Clients may predict only shot sound, tracer and ammo display. The simulation still consumes ammunition and decides damage. Confirmations clear pending cosmetic shots and avoid playing the local sound twice. A burst of received snapshots triggers one reconciliation of the newest state before the next input tick rather than replaying the pending input list for each stale snapshot.
+
+The canvas remains at native display density, capped at a 2560×1600 render budget. Graphics quality changes the static world texture detail instead of blurring the whole canvas. Avatar, weapon and HUD style resources are cached rather than rebuilt per frame. The camera reserves a 210-unit lower HUD band; players at the bottom of the map stay above it. Browser sharing buttons live in an HTML room bar so clipboard writes occur in an actual browser user-activation event.

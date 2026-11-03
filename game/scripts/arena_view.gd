@@ -5,6 +5,8 @@ const PilotArt=preload("res://scripts/art.gd")
 const Arsenal=preload("res://scripts/arsenal_art.gd")
 var main: Node
 var terrain: Node2D
+var detail_scale=1.0
+var panel_styles: Dictionary={}
 var camera=Vector2(800,550)
 var zoom=0.94
 var origin=Vector2.ZERO
@@ -36,7 +38,7 @@ func _effects(events: Array) -> void:
 		else:particles.append(e)
 		var weight=0.8 if e.get("by",0)==Net.local_id else 0.25
 		match e.kind:
-			"shot":main.audio.play(["shot","shot","scatter","shot","volt","volt"][int(e.weapon)],weight)
+			"shot":main.audio.play("gun_"+str(int(e.weapon)),weight)
 			"boom":main.audio.play("boom",0.6)
 			"hit":
 				if e.id==Net.local_id:hurt_flash=0.3
@@ -50,14 +52,14 @@ func _process(delta: float) -> void:
 	feed=feed.filter(func(e):return e.age<5)
 	var playing=Net.active and Net.state.get("phase","") in ["match","results"]
 	var index=Net.map_id if Net.active else main.selected_map
-	terrain.set_map(index)
+	terrain.set_map(index,detail_scale)
 	if playing:
 		zoom=0.94
 		var players=Net.render_players();var local=players.get(Net.local_id,{})
 		if not local.is_empty():camera=camera.lerp(local.p,1-exp(-8*delta))
 		camera.x=clampf(camera.x,720/zoom,ArenaMaps.WIDTH-720/zoom)
-		camera.y=clampf(camera.y,450/zoom,ArenaMaps.HEIGHT-450/zoom)
-		origin=Vector2(720,450)-camera*zoom
+		camera.y=clampf(camera.y,345/zoom,ArenaMaps.HEIGHT-345/zoom)
+		origin=Vector2(720,345)-camera*zoom
 	else:
 		zoom=0.53;origin=Vector2(1000,435)-Vector2(1690,870)*zoom
 	terrain.position=origin;terrain.scale=Vector2.ONE*zoom
@@ -67,8 +69,10 @@ func text_at(pos: Vector2,text: String,size: int=16,color: Color=Color("d8d5be")
 	draw_string(font,pos,text,HORIZONTAL_ALIGNMENT_LEFT,-1,size,color)
 
 func panel(rect: Rect2,color: Color=Color("202720"),border: Color=Color("545747"),radius: int=10) -> void:
-	var style=StyleBoxFlat.new();style.bg_color=color;style.border_color=border;style.set_border_width_all(1);style.set_corner_radius_all(radius)
-	draw_style_box(style,rect)
+	var key=color.to_html()+border.to_html()+str(radius)
+	if not panel_styles.has(key):
+		var style=StyleBoxFlat.new();style.bg_color=color;style.border_color=border;style.set_border_width_all(1);style.set_corner_radius_all(radius);panel_styles[key]=style
+	draw_style_box(panel_styles[key],rect)
 
 func world_transform(point: Vector2,scale_value: float=1,angle: float=0) -> Transform2D:
 	return Transform2D(angle,origin+point*zoom).scaled_local(Vector2.ONE*zoom*scale_value)
@@ -83,9 +87,11 @@ func _draw() -> void:
 		# Warm, quiet surfaces let the illustrated arena do the work.
 		draw_rect(Rect2(0,0,1440,900),Color(0.05,0.065,0.052,0.28))
 		for j in range(24):draw_rect(Rect2(j*28,0,29,900),Color(0.065,0.078,0.063,clampf(0.92-j*0.036,0,0.92)))
-		text_at(Vector2(625,174),"BATTLEFIELD / 0"+str(index+1),12,accent)
-		text_at(Vector2(625,213),ArenaMaps.NAMES[index],33,Color("f0e5cb"))
-		text_at(Vector2(625,242),ArenaMaps.SUBTITLES[index],14,Color("b9b99e"))
+		if main.screen in ["menu","lan"]:
+			text_at(Vector2(625,174),"BATTLEFIELD / 0"+str(index+1),12,accent)
+			text_at(Vector2(625,213),ArenaMaps.NAMES[index],33,Color("f0e5cb"))
+			text_at(Vector2(625,242),ArenaMaps.SUBTITLES[index],14,Color("b9b99e"))
+
 		if main.screen=="character":
 			panel(Rect2(594,138,786,638),Color(0.09,0.115,0.09,0.92),Color("505848"))
 			draw_circle(Vector2(1005,479),190,Color(accent,0.035))
@@ -93,6 +99,12 @@ func _draw() -> void:
 			PilotArt.pilot(self,Vector2(1005,475),main.selected_character,-0.14,time,Vector2.ZERO,true,4.2,false,1)
 			text_at(Vector2(665,705),PilotArt.NAMES[main.selected_character],38,Color("f0e5cb"))
 			text_at(Vector2(665,738),PilotArt.ROLES[main.selected_character]+" / JETPACK OPERATOR",13,accent)
+		elif main.screen=="online":
+			panel(Rect2(594,138,786,638),Color(0.09,0.115,0.09,0.92),Color("505848"))
+			PilotArt.pilot(self,Vector2(1005,450),main.selected_character,-0.12,time,Vector2.ZERO,true,4.8,false,1)
+			text_at(Vector2(666,650),PilotArt.NAMES[main.selected_character],40,Color("f0e5cb"))
+			text_at(Vector2(666,689),PilotArt.ROLES[main.selected_character],15,accent)
+			text_at(Vector2(666,738),"ROOM CODES / INVITE LINKS / 2–8 PILOTS",13,Color("aab89b"))
 		elif main.screen=="armory":draw_armory()
 		return
 	# Live supplies, clearly readable silhouettes, with grounded weapon racks.
@@ -143,7 +155,7 @@ func _draw() -> void:
 	for p in players.values():
 		if p.hp<=0:continue
 		var point=origin+p.p*zoom
-		PilotArt.pilot(self,point,int(p.char),p.aim,time,p.v,p.jet,zoom,p.shield>0,int(p.weapon))
+		PilotArt.pilot(self,point,int(p.char),p.aim,time,p.v,p.jet,zoom,p.shield>0,int(p.weapon),p.get("crouched",false))
 		var color=Color("e9c785") if p.id==Net.local_id else (Color("a5c5bb") if p.team==0 else Color("e6a17c"))
 		text_at(point+Vector2(-22,-54),p.name,12,color if p.online else Color("877f6c"))
 		draw_rect(Rect2(point+Vector2(-20,-47),Vector2(40,3)),Color("33372e"))
@@ -174,6 +186,7 @@ func draw_armory() -> void:
 		text_at(Vector2(645,738),"Collect grenade supplies around the battlefield.",16)
 
 func hud(local: Dictionary,map: Dictionary) -> void:
+	draw_rect(Rect2(0,690,1440,210),Color("151f18"))
 	var state=Net.state;var amber=Color("e8bf79")
 	panel(Rect2(552,18,336,75),Color(0.07,0.09,0.07,0.94),Color("535542"))
 	var remaining=int(state.remaining)
@@ -225,7 +238,7 @@ func hud(local: Dictionary,map: Dictionary) -> void:
 			text_at(Vector2(605,430),"Respawning in %.1f s"%maxf(0,local.dead),21)
 			text_at(Vector2(576,461),"New drop. New route. Go again.",15,Color("a7b093"))
 	if Input.is_physical_key_pressed(KEY_TAB) or state.phase=="results":scoreboard()
-	else:text_at(Vector2(320,786),"SPACE  JUMP     W / RMB  JETPACK     E  PICK UP     G  THROW     TAB  SCORE",11,Color("b8b99c"))
+	else:text_at(Vector2(320,786),"SPACE JUMP    W JETPACK    S / CTRL CROUCH    E PICK UP    G GRENADE    TAB SCORE",11,Color("b8b99c"))
 	for j in range(feed.size()):text_at(Vector2(1140,115+j*24),feed[j].killer+"  >  "+feed[j].victim,13,Color("d8d8bd"))
 	var cursor=get_viewport().get_mouse_position()
 	if not main.paused:

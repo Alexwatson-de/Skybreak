@@ -32,6 +32,7 @@ func read(aim_origin: Vector2, mouse_world: Vector2, blocked: bool=false) -> Dic
 	last_q=q
 	input.x=float(Input.is_physical_key_pressed(KEY_D) or Input.is_physical_key_pressed(KEY_RIGHT))-float(Input.is_physical_key_pressed(KEY_A) or Input.is_physical_key_pressed(KEY_LEFT))
 	input.jump=Input.is_physical_key_pressed(KEY_SPACE)
+	input.crouch=Input.is_physical_key_pressed(KEY_S) or Input.is_physical_key_pressed(KEY_DOWN) or Input.is_physical_key_pressed(KEY_CTRL)
 	input.jet=Input.is_physical_key_pressed(KEY_W) or Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT) or Input.is_physical_key_pressed(KEY_UP)
 	input.fire=Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT)
 	input.grenade=Input.is_physical_key_pressed(KEY_G)

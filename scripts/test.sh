@@ -2,6 +2,7 @@
 set -euo pipefail
 source "$(dirname "$0")/engine.sh"
 "$GODOT_BIN" --headless --path "$TASK_ROOT/game" --script tests/simulation_test.gd
+"$GODOT_BIN" --headless --path "$TASK_ROOT/game" --script tests/prediction_test.gd
 cd "$TASK_ROOT/backend"
 npm run build
 npm test

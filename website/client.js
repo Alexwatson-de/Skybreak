@@ -7,8 +7,11 @@
   let resizeCanvas = () => {};
   let quality = 'auto';
   let autoWidth = 1280;
+  let worldDetail = 1;
   let slowFrames = 0;
   let fastFrames = 0;
+  let currentRoom = '';
+  let currentInvite = '';
   try { quality = localStorage.getItem('skybreak.graphics') || 'auto'; } catch {}
   if (!['auto', 'low', 'high'].includes(quality)) quality = 'auto';
   $('quality').value = quality;
@@ -20,8 +23,29 @@
     resizeCanvas();
   });
   window.Skybreak = {
+    detail: () => worldDetail,
+    async copyInvite(value) {
+      if (!value) return;
+      try {
+        await navigator.clipboard.writeText(value);
+        $('invite-feedback').textContent = 'Copied!';
+      } catch {
+        const field = document.createElement('textarea');
+        field.value = value; field.setAttribute('readonly', '');
+        field.style.position = 'fixed'; field.style.opacity = '0';
+        document.body.appendChild(field); field.select();
+        const copied = document.execCommand('copy'); field.remove();
+        $('invite-feedback').textContent = copied ? 'Copied!' : `Copy this: ${value}`;
+      }
+    },
     update(report) {
       const playing = ['match', 'results'].includes(report.phase);
+      const sharing = report.screen === 'online_lobby' && !!report.room && !playing;
+      $('invite-bar').hidden = !sharing;
+      document.body.classList.toggle('room-open', sharing);
+      if (currentRoom !== report.room) $('invite-feedback').textContent = '';
+      currentRoom = report.room || ''; currentInvite = report.invite_url || '';
+      $('invite-code').textContent = currentRoom;
       if (quality === 'auto' && !playing && autoWidth !== 1280) {
         autoWidth = 1280;
         slowFrames = fastFrames = 0;
@@ -47,6 +71,8 @@
       $('live-metrics').textContent = JSON.stringify(report, null, 2);
     }
   };
+  $('copy-code').addEventListener('click', () => window.Skybreak.copyInvite(currentRoom));
+  $('copy-link').addEventListener('click', () => window.Skybreak.copyInvite(currentInvite));
   $('fullscreen').addEventListener('click', () => {
     const action = document.fullscreenElement ? document.exitFullscreen() : $('stage').requestFullscreen();
     action?.catch(() => { $('connection-summary').textContent = 'Fullscreen unavailable in this browser'; });
@@ -86,14 +112,16 @@
     resizeCanvas = () => {
       const rect = canvas.getBoundingClientRect();
       if (!rect.width || !rect.height) return;
-      const budget = quality === 'high' ? 1920 : quality === 'low' ? 800 : autoWidth;
-      const ratio = Math.min(devicePixelRatio || 1, budget / rect.width, (budget / 1.6) / rect.height);
+      // UI is always rendered at native density. Quality changes world detail,
+      // never the whole canvas, so labels and inventory cannot become blurred.
+      worldDetail = quality === 'low' ? 0.6 : quality === 'high' ? 1 : autoWidth / 1280;
+      const ratio = Math.min(devicePixelRatio || 1, 2, 2560 / rect.width, 1600 / rect.height);
       const width = Math.max(1, Math.round(rect.width * ratio));
       const height = Math.max(1, Math.round(rect.height * ratio));
       // Reassigning even the same size clears WebGL's drawing buffer.
       if (canvas.width !== width) canvas.width = width;
       if (canvas.height !== height) canvas.height = height;
-      $('quality-status').textContent = `${quality === 'auto' ? 'Auto' : quality === 'low' ? 'Low' : 'High'} graphics · ${width} × ${height}`;
+      $('quality-status').textContent = `${quality === 'auto' ? 'Auto' : quality === 'low' ? 'Low' : 'High'} world detail · Sharp interface`;
     };
     resizeCanvas();
     new ResizeObserver(resizeCanvas).observe($('stage'));

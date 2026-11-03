@@ -12,6 +12,7 @@ func _ready() -> void:
 	clips.shot=make_sound(0.13,0)
 	clips.scatter=make_sound(0.24,1)
 	clips.volt=make_sound(0.22,2)
+	for weapon in range(6):clips["gun_"+str(weapon)]=load("res://assets/audio/weapon_"+str(weapon)+".wav")
 	clips.boom=make_sound(0.7,3)
 	clips.hit=make_sound(0.07,4)
 	for i in range(14):
@@ -54,7 +55,7 @@ func make_sound(duration: float, kind: int) -> AudioStreamWAV:
 	return wav
 
 func play(kind: String, weight: float=1.0) -> void:
-	if not enabled or volume<=0 or not clips.has(kind): return
+	if not enabled or volume<=0 or weight<=0.01 or not clips.has(kind): return
 	for p in pool:
 		if not p.playing:
 			p.stream=clips[kind]

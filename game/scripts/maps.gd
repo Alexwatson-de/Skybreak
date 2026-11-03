@@ -3,13 +3,16 @@ extends RefCounted
 
 const WIDTH=3200.0
 const HEIGHT=1800.0
-const NAMES=["THE HOLLOW","ROOTBOUND RUINS","EMBER QUARRY"]
-const SUBTITLES=["Buried catacombs. Broken arches. A fight on every level.","A forgotten temple, swallowed by the earth.","Old mine shafts cut through a volcanic canyon."]
-const ACCENTS=[Color("e5b66b"),Color("9dcc89"),Color("ed9562")]
+const NAMES=["CATACOMBS","ROOTBOUND RUINS","EMBER QUARRY","OUTPOST","PYRAMID","SO LONG"]
+const SUBTITLES=["Buried catacombs. Broken arches. A fight on every level.","A forgotten temple, swallowed by the earth.","Old mine shafts cut through a volcanic canyon.","Grassy islands, a watchtower and a low bunker flank.","A stepped sandstone fortress, hidden chambers and escape shafts.","Long firing lanes above a winding underground bypass."]
+const ACCENTS=[Color("e5b66b"),Color("9dcc89"),Color("ed9562"),Color("a8d593"),Color("ebca78"),Color("a8c5dc")]
 const PALETTES=[
 	[Color("332c2a"),Color("665144"),Color("967458"),Color("b4926a"),Color("28282b")],
 	[Color("252f2b"),Color("4c5941"),Color("7f8c58"),Color("bdba83"),Color("1c2827")],
-	[Color("352727"),Color("705041"),Color("a87650"),Color("dbad75"),Color("2a2527")]
+	[Color("352727"),Color("705041"),Color("a87650"),Color("dbad75"),Color("2a2527")],
+ [Color("303b2a"),Color("6a6546"),Color("9d9971"),Color("b2c77c"),Color("375566")],
+ [Color("51402c"),Color("a77e47"),Color("d1ac6b"),Color("ecd09a"),Color("574632")],
+ [Color("2d373b"),Color("526369"),Color("8c9b9c"),Color("bed0bd"),Color("26383f")]
 ]
 static var cache: Dictionary={}
 
@@ -53,7 +56,7 @@ static func _compile(terrain: Array) -> Array:
 	return result
 
 static func data(index: int) -> Dictionary:
-	index=clampi(index,0,2)
+	index=clampi(index,0,NAMES.size()-1)
 	if cache.has(index):return cache[index]
 	var terrain: Array=[]
 	# Continuous geological strata enclose the arena; ledges have irregular outlines.
@@ -107,7 +110,7 @@ static func data(index: int) -> Dictionary:
 		spawns=[Vector2(260,340),Vector2(2910,340),Vector2(570,750),Vector2(2650,750),Vector2(1140,1190),Vector2(1830,1180),Vector2(700,1460),Vector2(2400,1460)]
 		lamps=[Vector2(620,675),Vector2(2600,675),Vector2(1580,725),Vector2(1280,1120),Vector2(1940,1120),Vector2(1570,1440)]
 		props=[Vector3(1420,1715,2),Vector3(1780,1715,2),Vector3(540,1488,3),Vector3(2420,1488,3),Vector3(450,1714,0),Vector3(2760,1714,0)]
-	else:
+	elif index==2:
 		terrain.append(shelf(80,420,670,190,71))
 		terrain.append(shelf(2440,420,685,190,72))
 		terrain.append(shelf(1230,290,740,200,73))
@@ -124,21 +127,58 @@ static func data(index: int) -> Dictionary:
 		spawns=[Vector2(270,365),Vector2(2890,365),Vector2(610,770),Vector2(2560,770),Vector2(1180,1180),Vector2(1780,1175),Vector2(610,1450),Vector2(2580,1450)]
 		lamps=[Vector2(620,695),Vector2(2580,695),Vector2(1570,705),Vector2(1250,1100),Vector2(1950,1100),Vector2(1550,1580)]
 		props=[Vector3(500,1714,4),Vector3(2670,1714,4),Vector3(1190,1205,4),Vector3(2000,1205,4),Vector3(680,797,0),Vector3(2450,797,0)]
+	elif index==3:
+		# Open-air outpost: asymmetrical hills, floating ledges and a timber tower.
+		for r in [Rect2(90,520,730,250),Rect2(2320,630,790,260),Rect2(1080,860,610,180),Rect2(340,1190,640,200),Rect2(2000,1230,740,180),Rect2(1170,1490,670,120)]:
+			terrain.append(shelf(r.position.x,r.position.y,r.size.x,r.size.y,90+terrain.size()))
+		terrain.append(polygon([Vector2(1080,860),Vector2(1450,560),Vector2(1630,590),Vector2(1420,910)]))
+		terrain.append(block(1780,460,450,45,2))
+		terrain.append(block(1830,180,45,280,2));terrain.append(block(2140,180,45,280,2))
+		terrain.append(block(1740,160,530,55,2))
+		terrain.append(block(1840,795,360,38,2))
+		spawns=[Vector2(260,470),Vector2(2860,580),Vector2(1200,610),Vector2(2020,410),Vector2(560,1140),Vector2(2510,1180),Vector2(1350,1440),Vector2(2840,1680)]
+		lamps=[Vector2(2010,365),Vector2(1910,740),Vector2(1360,1380)]
+		props=[Vector3(380,500,3),Vector3(2650,610,3),Vector3(1970,440,4)]
+	elif index==4:
+		# Hollow stepped pyramid: the chambers are open space, not a solid triangle.
+		for j in range(5):
+			var y=480+j*235;var edge=1320-j*225
+			terrain.append(block(edge,y,300,65,1))
+			terrain.append(block(3200-edge-300,y,300,65,1))
+			if j<4:
+				terrain.append(polygon([Vector2(edge,y),Vector2(edge-160,y+235),Vector2(edge-94,y+235),Vector2(edge+65,y)],1))
+				terrain.append(polygon([Vector2(3200-edge-65,y),Vector2(3200-edge+94,y+235),Vector2(3200-edge+160,y+235),Vector2(3200-edge,y)],1))
+		for r in [Rect2(1340,845,520,55),Rect2(1110,1315,980,55),Rect2(80,1120,520,110),Rect2(2600,1120,520,110)]:terrain.append(block(r.position.x,r.position.y,r.size.x,r.size.y,1))
+		spawns=[Vector2(1400,430),Vector2(1840,430),Vector2(1300,665),Vector2(1800,650),Vector2(300,1070),Vector2(2870,1070),Vector2(1260,1265),Vector2(1950,1265)]
+		lamps=[Vector2(1600,690),Vector2(1600,1180),Vector2(760,1450),Vector2(2440,1450)]
+		props=[Vector3(1500,1290,0),Vector3(1760,1290,0),Vector3(370,1710,2),Vector3(2800,1710,2)]
+	else:
+		# So Long: staggered horizontal firing lanes with broken bridges and flanks.
+		for r in [Rect2(90,480,850,120),Rect2(1150,480,750,120),Rect2(2130,480,980,120),Rect2(330,925,1200,90),Rect2(1800,925,1040,90),Rect2(90,1390,810,110),Rect2(1140,1390,980,110),Rect2(2370,1390,740,110)]:terrain.append(shelf(r.position.x,r.position.y,r.size.x,r.size.y,120+terrain.size(),2))
+		for x in [1030,2020]:terrain.append(block(x,650,48,510,1))
+		terrain.append(polygon([Vector2(900,1390),Vector2(1160,1190),Vector2(1220,1230),Vector2(980,1460)],2))
+		spawns=[Vector2(250,430),Vector2(2900,430),Vector2(1260,430),Vector2(2270,430),Vector2(560,875),Vector2(2460,875),Vector2(1380,1340),Vector2(2720,1340)]
+		lamps=[Vector2(630,780),Vector2(2520,780),Vector2(1560,1240)]
+		props=[Vector3(410,1370,4),Vector3(2520,1370,4),Vector3(1510,460,3)]
 	# Connected cave masses and low, fractured ceilings create rooms rather than
 	# a stack of detached rectangular platforms. Open shafts remain between them.
-	terrain.append(polygon([Vector2(0,0),Vector2(3200,0),Vector2(3200,150),Vector2(2960,155),Vector2(2760,110),Vector2(2510,140),Vector2(2330,80),Vector2(1990,100),Vector2(1720,65),Vector2(1430,100),Vector2(1160,70),Vector2(840,130),Vector2(600,100),Vector2(370,160),Vector2(120,145),Vector2(0,175)]))
-	var base_y=[820,900,920][index]
-	var column=PackedVector2Array([Vector2(350,base_y),Vector2(450,base_y-5),Vector2(500,base_y+70),Vector2(453,base_y+160),Vector2(490,base_y+300),Vector2(350,base_y+310),Vector2(365,base_y+180),Vector2(330,base_y+90)])
-	terrain.append({"points":column,"material":0})
-	var mirrored=PackedVector2Array()
-	for j in range(column.size()-1,-1,-1):mirrored.append(Vector2(WIDTH-column[j].x,column[j].y))
-	terrain.append({"points":mirrored,"material":0})
+	if index<3:
+		terrain.append(polygon([Vector2(0,0),Vector2(3200,0),Vector2(3200,150),Vector2(2960,155),Vector2(2760,110),Vector2(2510,140),Vector2(2330,80),Vector2(1990,100),Vector2(1720,65),Vector2(1430,100),Vector2(1160,70),Vector2(840,130),Vector2(600,100),Vector2(370,160),Vector2(120,145),Vector2(0,175)]))
+		var base_y=[820,900,920][mini(index,2)]
+		var column=PackedVector2Array([Vector2(350,base_y),Vector2(450,base_y-5),Vector2(500,base_y+70),Vector2(453,base_y+160),Vector2(490,base_y+300),Vector2(350,base_y+310),Vector2(365,base_y+180),Vector2(330,base_y+90)])
+		terrain.append({"points":column,"material":0})
+		var mirrored=PackedVector2Array()
+		for j in range(column.size()-1,-1,-1):mirrored.append(Vector2(WIDTH-column[j].x,column[j].y))
+		terrain.append({"points":mirrored,"material":0})
+
 	if index==0:
 		var mass=PackedVector2Array([Vector2(90,1180),Vector2(450,1240),Vector2(530,1340),Vector2(470,1440),Vector2(340,1550),Vector2(90,1620)])
 		terrain.append({"points":mass,"material":0})
 		var mirrored_mass=PackedVector2Array()
 		for j in range(mass.size()-1,-1,-1):mirrored_mass.append(Vector2(WIDTH-mass[j].x,mass[j].y))
 		terrain.append({"points":mirrored_mass,"material":0})
+	terrain.append(polygon([Vector2(900,1730),Vector2(1240,1730),Vector2(1240,1800),Vector2(900,1800)],1))
+	terrain.append(polygon([Vector2(960,1635),Vector2(1180,1635),Vector2(1180,1688),Vector2(960,1688)],1))
 	# Distinct weapons are actually collected, rather than all being granted on spawn.
 	var anchors=[spawns[0]+Vector2(170,14),spawns[1]+Vector2(-170,14),spawns[2]+Vector2(120,14),spawns[3]+Vector2(-120,14),spawns[4]+Vector2(90,14),spawns[5]+Vector2(-90,14),Vector2(1590,230),Vector2(1590,1675)]
 	for j in range(anchors.size()):loot.append({"kind":"gun","item":1+j%5,"p":anchors[j]})
@@ -149,6 +189,7 @@ static func data(index: int) -> Dictionary:
 	if index==1:
 		loot[7].p=Vector2(1590,1528)
 		loot[12].p=Vector2(1340,1198)
+	if index==4:loot[8].p=Vector2(1460,790)
 	var positions: Array=[]
 	for item in loot:positions.append(item.p)
 	var result={"terrain":terrain,"platforms":_compile(terrain),"spawns":spawns,"loot":loot,"pickups":positions,"lamps":lamps,"props":props,"width":WIDTH,"height":HEIGHT}

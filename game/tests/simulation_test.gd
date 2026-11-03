@@ -25,7 +25,7 @@ func step(s: Dictionary,inputs: Dictionary={},count: int=1) -> Array:
 	return events
 
 func _initialize() -> void:
-	for map_id in range(3):
+	for map_id in range(Maps.NAMES.size()):
 		var map=Maps.data(map_id)
 		var equivalent=true
 		for spawn in map.spawns:
@@ -54,7 +54,7 @@ func _initialize() -> void:
 	p=Sim.player(1,"One",0,0,Vector2(120,250));input=Sim.blank();input.x=1.0
 	for j in range(95):Sim.move(p,input,[ramp],Sim.DT)
 	check(p.p.x>240 and p.p.y<380,"sloped polygon terrain can be traversed")
-	for index in range(3):
+	for index in range(Maps.NAMES.size()):
 		var map=Maps.data(index)
 		check(map.terrain.size()>=15 and map.platforms.size()>=map.terrain.size(),"arena "+str(index)+" has compiled irregular terrain")
 		var free=true
@@ -78,6 +78,21 @@ func _initialize() -> void:
 			for shape in map.platforms:
 				if Sim.penetration(item.p,Vector2(9,12),shape).length()>0.1:reachable=false
 		check(reachable,"arena "+str(index)+" loot is outside solid terrain")
+	check(Sim.ray_player(Vector2(0,980),Vector2.RIGHT,Vector2(100,1000))<INF and Sim.ray_player(Vector2(0,980),Vector2.RIGHT,Vector2(100,1000),true)==INF,"crouching reduces the authoritative bullet target")
+	var passage=[Rect2(0,1000,3200,100),Rect2(350,900,240,66)]
+	p=Sim.player(1,"Crawler",0,0,Vector2(300,975));input=Sim.blank();input.x=1.0
+	for j in range(45):Sim.move(p,input,passage,Sim.DT)
+	check(p.p.x<336,"standing player is blocked by a low passage")
+	input.crouch=true
+	for j in range(75):Sim.move(p,input,passage,Sim.DT)
+	check(p.crouched and p.p.x>400 and p.p.x<580,"crouching reduces the collider and permits crawling")
+	input.crouch=false;input.x=0.0
+	for j in range(10):Sim.move(p,input,passage,Sim.DT)
+	check(p.crouched,"authority prevents standing inside a ceiling")
+	input.x=1.0
+	for j in range(170):Sim.move(p,input,passage,Sim.DT)
+	check(not p.crouched and p.p.x>620,"player stands automatically after clearing the passage")
+	check(absf(p.p.y+25-1000)<0.1,"standing and crouching preserve foot contact")
 	var hollow=Maps.data(0)
 	check(Sim.wall_distance(Vector2(1510,600),Vector2.RIGHT,140,hollow.platforms)==140,"catacomb arch opening is passable to weapon rays")
 	check(Sim.wall_distance(Vector2(1590,600),Vector2.UP,150,hollow.platforms)<150,"arch masonry blocks weapon rays")

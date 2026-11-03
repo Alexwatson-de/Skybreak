@@ -61,7 +61,7 @@ func _process(_delta: float) -> void:
 		while ws.get_available_packet_count()>0:
 			var packet=ws.get_packet().get_string_from_utf8()
 			if packet.begins_with("0"):
-				ws.send_text("40"+JSON.stringify({"session":session,"name":Net.profile.name,"char":Net.profile.char}))
+				ws.send_text("40"+JSON.stringify({"session":session,"name":Net.profile.name,"char":Net.profile.char,"protocol":3}))
 			elif packet=="2": ws.send_text("3")
 			elif packet.begins_with("40"):
 				connected=true

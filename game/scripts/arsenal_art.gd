@@ -2,12 +2,16 @@ class_name ArsenalArt
 extends RefCounted
 const GrenadeData=preload("res://scripts/grenade_art_data.gd")
 static var grenade_textures: Dictionary={}
+static var box_cache: Dictionary={}
 const INK=Color("17211f")
 const STEEL=Color("88968d")
 const COLORS=[Color("b4bca2"),Color("c4a76d"),Color("d6a179"),Color("96b6aa"),Color("c0c09e"),Color("9dc6cb")]
 
 static func rect(c: CanvasItem,r: Rect2,color: Color,radius: int=2) -> void:
-	var box=StyleBoxFlat.new();box.bg_color=color;box.border_color=INK;box.set_border_width_all(2);box.set_corner_radius_all(radius)
+	var key=color.to_html()+str(radius)
+	if not box_cache.has(key):
+		var cached=StyleBoxFlat.new();cached.bg_color=color;cached.border_color=INK;cached.set_border_width_all(2);cached.set_corner_radius_all(radius);box_cache[key]=cached
+	var box: StyleBoxFlat=box_cache[key]
 	c.draw_style_box(box,r)
 
 static func gun(c: CanvasItem,index: int,transform: Transform2D) -> void:

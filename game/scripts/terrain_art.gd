@@ -17,7 +17,7 @@ func _draw() -> void:
 			var x=j*310-190+layer*45;var y=90+layer*70
 			var points=PackedVector2Array([Vector2(x,-500),Vector2(x+340,-500),Vector2(x+320,y+300+rng.randf()*350),Vector2(x+190,y+260+rng.randf()*350),Vector2(x+40,y+480)])
 			draw_colored_polygon(points,colors[4].lightened(0.015*layer))
-	for j in range(25):
+	for j in range(0 if map_id==3 else 25):
 		var x=140+(j%8)*410+((j/8)%2)*80;var y=260+(j/8)*510
 		var col=colors[1].darkened(0.63)
 		draw_style_box(box(col,42),Rect2(x,y,140,240))
@@ -76,6 +76,7 @@ func _draw() -> void:
 				for k in range(3):
 					var root=a.lerp(b,float(k+1)/4)
 					draw_polyline(PackedVector2Array([root,root+Vector2(16,20),root+Vector2(5,54),root+Vector2(18,68)]),colors[2].darkened(0.2),3,true)
+	draw_string(ThemeDB.fallback_font,Vector2(905,1618),"LOW PASSAGE / S TO CRAWL",HORIZONTAL_ALIGNMENT_LEFT,-1,18,colors[3])
 	for prop in map.props:draw_prop(Vector2(prop.x,prop.y),int(prop.z),colors)
 	# Wooden mine braces and hanging chains frame the third arena.
 	if map_id==2:

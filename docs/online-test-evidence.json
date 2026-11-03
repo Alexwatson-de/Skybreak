@@ -1,9 +1,9 @@
 {
-  "date": "2026-11-03T05:43:43.740Z",
+  "date": "2026-11-03T06:49:15.062Z",
   "scope": "local",
   "endpoint": "http://127.0.0.1:3017",
   "client_kind": "engine-project",
-  "transport": "websocket",
+  "transport": "enet",
   "checks": [
     "room codes",
     "invite link",
@@ -21,17 +21,18 @@
   ],
   "alpha": {
     "discovered": {},
+    "invite_url": "",
     "lobby_status": "OFFLINE",
     "local_id": 1,
     "map": 0,
     "metrics": {
-      "hits": 13,
-      "kills": 2,
+      "hits": 19,
+      "kills": 3,
       "max_snapshot_bytes": 0,
       "reconnects": 0,
       "rejected": 0,
-      "shots": 130,
-      "snapshots": 318
+      "shots": 146,
+      "snapshots": 315
     },
     "phase": "match",
     "ping_ms": 15,
@@ -42,62 +43,65 @@
           0,
           0,
           0,
-          2,
-          0
+          0,
+          10
         ],
-        "deaths": 1,
-        "hp": 56,
+        "crouched": false,
+        "deaths": 2,
+        "hp": 0,
         "id": 2,
         "kills": 1,
         "name": "Bravo",
         "online": true,
         "position": [
-          2263.26049804688,
-          615.446594238281
+          970.437255859375,
+          652.521179199219
         ],
-        "seq": 888
+        "seq": 855
       },
       {
         "ammo": [
+          10,
           0,
           0,
-          0,
-          0,
+          23,
           0,
           0
         ],
+        "crouched": false,
         "deaths": 1,
-        "hp": 100,
+        "hp": 61,
         "id": 1,
-        "kills": 1,
+        "kills": 2,
         "name": "Alpha",
         "online": true,
         "position": [
-          2260.47802734375,
-          1135.71801757812
+          793.248474121094,
+          602.224487304688
         ],
-        "seq": 953
+        "seq": 914
       }
     ],
     "room": "",
     "screen": "game",
-    "status": "CONNECTED · ONLINE",
-    "time": 17.7500000000003,
-    "transport": "websocket"
+    "status": "CONNECTED · ENet",
+    "time": 26.5999999999998,
+    "transport": "enet"
   },
   "bravo": {
     "discovered": {},
+    "invite_url": "",
     "lobby_status": "OFFLINE",
     "local_id": 2,
     "map": 0,
     "metrics": {
-      "hits": 13,
-      "kills": 2,
+      "hits": 19,
+      "kills": 3,
       "max_snapshot_bytes": 0,
       "reconnects": 1,
       "rejected": 0,
-      "shots": 130,
-      "snapshots": 297
+      "shots": 142,
+      "snapshots": 293
     },
     "phase": "match",
     "ping_ms": 15,
@@ -108,47 +112,49 @@
           0,
           0,
           0,
-          2,
-          0
+          0,
+          10
         ],
-        "deaths": 1,
-        "hp": 56,
+        "crouched": false,
+        "deaths": 2,
+        "hp": 0,
         "id": 2,
         "kills": 1,
         "name": "Bravo",
         "online": true,
         "position": [
-          2263.26049804688,
-          615.446594238281
+          970.437255859375,
+          652.521179199219
         ],
-        "seq": 888
+        "seq": 855
       },
       {
         "ammo": [
+          10,
           0,
           0,
-          0,
-          0,
+          23,
           0,
           0
         ],
+        "crouched": false,
         "deaths": 1,
-        "hp": 100,
+        "hp": 61,
         "id": 1,
-        "kills": 1,
+        "kills": 2,
         "name": "Alpha",
         "online": true,
         "position": [
-          2260.47802734375,
-          1135.71801757812
+          793.248474121094,
+          602.224487304688
         ],
-        "seq": 953
+        "seq": 914
       }
     ],
     "room": "",
     "screen": "game",
-    "status": "CONNECTED · ONLINE",
-    "time": 17.7500000000003,
-    "transport": "websocket"
+    "status": "CONNECTED · ENet",
+    "time": 26.5999999999998,
+    "transport": "enet"
   }
 }

@@ -1,7 +1,7 @@
 extends Node
 const ArenaMaps = preload("res://scripts/maps.gd")
 const GameSim = preload("res://scripts/sim.gd")
-const SNAPSHOT_KEYS=["id","name","team","char","p","v","hp","fuel","ammo","reserve","weapon","grenades","reload","dead","shield","kills","deaths","score","seq","aim","ground","jet","online","last_jump","owned","grenade_ammo","grenade_type","last_pick"]
+const SNAPSHOT_KEYS=["id","name","team","char","p","v","hp","fuel","ammo","reserve","weapon","grenades","reload","dead","shield","kills","deaths","score","seq","aim","ground","jet","online","last_jump","owned","grenade_ammo","grenade_type","last_pick","crouched"]
 
 signal changed
 signal effects(events: Array)
@@ -19,6 +19,10 @@ var snapshots: Array=[]
 var pending: Array=[]
 var prediction: Dictionary={}
 var visual_error=Vector2.ZERO
+var reconcile_needed=false
+var predicted_shots: Array=[]
+var next_local_shot=0.0
+var last_local_shot=-10.0
 var transport="enet"
 var local_id=0
 var sequence=0
@@ -58,7 +62,7 @@ func _ready() -> void:
 func now() -> float: return Time.get_ticks_msec()/1000.0
 
 func fresh_state() -> Dictionary:
-	return {"phase":"lobby","map":map_id,"mode":mode_id,"players":{},"grenades":[],"time":0.0,"duration":300.0,"remaining":300.0,"scores":[0,0],"limit":15,"pickups":Array() ,"protocol":2}
+	return {"phase":"lobby","map":map_id,"mode":mode_id,"players":{},"grenades":[],"time":0.0,"duration":300.0,"remaining":300.0,"scores":[0,0],"limit":15,"pickups":Array() ,"protocol":3}
 
 func host(p: int=28760, server_only: bool=false, roster: Array=[], wire: String="enet") -> Error:
 	stop()
@@ -157,6 +161,10 @@ func stop(clear_join: bool=true) -> void:
 	pending.clear()
 	prediction={}
 	visual_error=Vector2.ZERO
+	reconcile_needed=false
+	predicted_shots.clear()
+	next_local_shot=0.0
+	last_local_shot=-10.0
 	lobby_players.clear()
 	chat.clear()
 	local_id=0
@@ -257,8 +265,8 @@ func denied(reason: String) -> void:
 
 @rpc("authority","call_remote","reliable",0)
 func accepted(slot: int, token: String, initial: Dictionary) -> void:
-	if initial.get("protocol",1)!=2:
-		denied("Install Skybreak Arena 1.1 on the host and every client.")
+	if initial.get("protocol",1)!=3:
+		denied("Refresh the website or install Skybreak Arena 1.3 on every client.")
 		return
 	local_id=slot
 	auth_token=token
@@ -358,6 +366,7 @@ func match_started(initial: Dictionary) -> void:
 func send_input(input: Dictionary) -> void:
 	if not active or state.get("phase","")!="match" or local_id==0: return
 	if not is_host and multiplayer.multiplayer_peer.get_connection_status()!=MultiplayerPeer.CONNECTION_CONNECTED: return
+	if not is_host and reconcile_needed:_reconcile_prediction()
 	sequence+=1
 	input.seq=sequence
 	input.time=state.time if is_host else now()+clock_offset
@@ -369,6 +378,34 @@ func send_input(input: Dictionary) -> void:
 			GameSim.move(prediction,input,map.platforms,GameSim.DT,map.collision_grid)
 			pending.append(input.duplicate())
 			if pending.size()>120: pending.pop_front()
+			_predict_shot(input)
+
+func _predict_shot(input: Dictionary) -> void:
+	# Cosmetic feedback only: the server still decides ammo, hits and damage.
+	if not input.get("fire",false) or prediction.hp<=0 or prediction.reload>0 or now()<next_local_shot:return
+	var weapon=int(prediction.weapon)
+	var outstanding=predicted_shots.filter(func(s):return s.weapon==weapon).size()
+	if prediction.ammo[weapon]<=outstanding:return
+	next_local_shot=now()+GameSim.COOLDOWN[weapon]
+	last_local_shot=now()
+	predicted_shots.append({"seq":input.seq,"weapon":weapon})
+	var origin: Vector2=prediction.p+Vector2(0,5 if prediction.get("crouched",false) else -5)
+	var direction=Vector2.from_angle(float(input.aim))
+	var length=GameSim.wall_distance(origin,direction,GameSim.RANGE[weapon],ArenaMaps.data(map_id).platforms)
+	effects.emit([{"kind":"shot","from":origin,"to":origin+direction*length,"by":local_id,"weapon":weapon,"predicted":true}])
+
+func _reconcile_prediction() -> void:
+	reconcile_needed=false
+	if not state.players.has(local_id):return
+	var authoritative=state.players[local_id]
+	var previous_position: Vector2=prediction.get("p",authoritative.p)
+	prediction=authoritative.duplicate(true)
+	pending=pending.filter(func(i):return i.seq>authoritative.seq)
+	predicted_shots=predicted_shots.filter(func(s):return s.seq>authoritative.seq)
+	var map=ArenaMaps.data(map_id)
+	for input in pending:GameSim.move(prediction,input,map.platforms,GameSim.DT,map.collision_grid)
+	var correction=previous_position-prediction.p
+	visual_error=(visual_error+correction).limit_length(80) if correction.length()<160 and authoritative.hp>0 else Vector2.ZERO
 
 @rpc("any_peer","call_remote","unreliable_ordered",1)
 func submit_input(input: Dictionary) -> void:
@@ -384,12 +421,12 @@ func submit_input(input: Dictionary) -> void:
 	var aim=float(input.get("aim",NAN))
 	var axis=float(input.get("x",NAN))
 	var sent_time=float(input.get("time",NAN))
-	if rate.count>100 or input.size()>14 or seq<=rate.seq or not is_finite(aim) or not is_finite(axis) or not is_finite(sent_time) or absf(axis)>1.0:
+	if rate.count>100 or input.size()>15 or seq<=rate.seq or not is_finite(aim) or not is_finite(axis) or not is_finite(sent_time) or absf(axis)>1.0:
 		metrics.rejected+=1
 		return
 	rate.seq=seq
 	var clean=GameSim.blank()
-	for key in ["jump","jet","fire","grenade","reload","interact"]: clean[key]=input.get(key,false)==true
+	for key in ["jump","crouch","jet","fire","grenade","reload","interact"]: clean[key]=input.get(key,false)==true
 	clean.x=axis
 	clean.aim=wrapf(aim,-PI,PI)
 	clean.seq=seq
@@ -414,7 +451,7 @@ func snapshot(packed: PackedByteArray, raw_size: int) -> void:
 	var decoded=packed.decompress(raw_size,FileAccess.COMPRESSION_ZSTD)
 	var compact=bytes_to_var(decoded)
 	if not compact is Array or compact.size()!=11: return
-	var data={"phase":compact[0],"map":compact[1],"mode":compact[2],"time":compact[3],"duration":compact[4],"remaining":compact[5],"scores":compact[6],"limit":compact[7],"pickups":compact[8],"grenades":[],"players":{},"protocol":2}
+	var data={"phase":compact[0],"map":compact[1],"mode":compact[2],"time":compact[3],"duration":compact[4],"remaining":compact[5],"scores":compact[6],"limit":compact[7],"pickups":compact[8],"grenades":[],"players":{},"protocol":3}
 	for g in compact[9]: data.grenades.append({"p":g[0],"v":g[1],"life":g[2],"by":g[3],"type":g[4],"burn":g[5],"pulse":g[6]})
 	for packed_player in compact[10]:
 		var p={}
@@ -426,21 +463,15 @@ func snapshot(packed: PackedByteArray, raw_size: int) -> void:
 	metrics.snapshots+=1
 	snapshots.append({"received":now(),"state":data})
 	while snapshots.size()>12: snapshots.pop_front()
-	if state.players.has(local_id):
-		var authoritative=state.players[local_id]
-		var previous_position: Vector2=prediction.get("p",authoritative.p)
-		prediction=authoritative.duplicate(true)
-		pending=pending.filter(func(i): return i.seq>authoritative.seq)
-		var map=ArenaMaps.data(map_id)
-		for input in pending: GameSim.move(prediction,input,map.platforms,GameSim.DT,map.collision_grid)
-		var correction=previous_position-prediction.p
-		visual_error=(visual_error+correction).limit_length(80) if correction.length()<160 and authoritative.hp>0 else Vector2.ZERO
+	# A slow frame may receive several snapshots. Reconcile only the newest one
+	# before the next input tick instead of replaying inputs for every old frame.
+	reconcile_needed=true
 	if previous!=state.phase: changed.emit()
 
 @rpc("authority","call_remote","reliable",2)
 func game_effects(events: Array) -> void:
 	_record_events(events)
-	effects.emit(events)
+	effects.emit(events.filter(func(e):return not (e.kind=="shot" and e.by==local_id and now()-last_local_shot<1.0)))
 
 func _record_events(events: Array) -> void:
 	for event in events:
@@ -468,6 +499,9 @@ func render_players() -> Dictionary:
 		result[local_id].v=prediction.v
 		result[local_id].jet=prediction.jet
 		result[local_id].aim=prediction.aim
+		result[local_id].crouched=prediction.get("crouched",false)
+		result[local_id].ammo=result[local_id].ammo.duplicate()
+		for shot in predicted_shots:result[local_id].ammo[shot.weapon]=maxi(0,result[local_id].ammo[shot.weapon]-1)
 	return result
 
 func bot_input(id: int) -> Dictionary:
