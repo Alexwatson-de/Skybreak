@@ -4,6 +4,8 @@ An original Godot 4.5.1 jetpack arena shooter with a browser client, native LAN 
 
 ## Play in a browser
 
+Live game: **https://skybreak-zeta.vercel.app/**. Source: [Alexwatson-de/Skybreak](https://github.com/Alexwatson-de/Skybreak). The multiplayer service runs at `https://skybreak-multiplayer.onrender.com`.
+
 The website runs the actual Godot game. Choose **Play Online**, create a room or join a code/invite, chat, choose teams, ready up, and let the host start. Practice against three bots is also available. A keyboard and mouse are required; mobile touch controls have not been implemented.
 
 Vercel serves the browser client. A Render **Free** Docker service runs the Node.js/TypeScript/Socket.IO lobby and a dedicated Godot process per match. Browser and current native online clients use WebSocket/WSS through the same public HTTPS port. Native Wi-Fi/hotspot hosting continues to use ENet. All modes share `game/scripts/sim.gd`; no game rules are reimplemented in the website.

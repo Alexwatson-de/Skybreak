@@ -152,6 +152,14 @@ static func data(index: int) -> Dictionary:
 	var positions: Array=[]
 	for item in loot:positions.append(item.p)
 	var result={"terrain":terrain,"platforms":_compile(terrain),"spawns":spawns,"loot":loot,"pickups":positions,"lamps":lamps,"props":props,"width":WIDTH,"height":HEIGHT}
+	result.collision_grid={}
+	for id in range(result.platforms.size()):
+		var bounds: Rect2=result.platforms[id].bounds
+		for y in range(floori(bounds.position.y/128),floori(bounds.end.y/128)+1):
+			for x in range(floori(bounds.position.x/128),floori(bounds.end.x/128)+1):
+				var cell=Vector2i(x,y)
+				if not result.collision_grid.has(cell):result.collision_grid[cell]=[]
+				result.collision_grid[cell].append(id)
 	result.nav=_navigation(result.platforms)
 	cache[index]=result
 	return result

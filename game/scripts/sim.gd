@@ -43,7 +43,18 @@ static func penetration(center: Vector2,half: Vector2,value: Variant) -> Vector2
 			correction=axis*positive if positive<negative else -axis*negative
 	return correction
 
-static func move(p: Dictionary,input: Dictionary,platforms: Array,dt: float) -> void:
+static func nearby_shapes(platforms: Array,grid: Dictionary,bounds: Rect2) -> Array:
+	if grid.is_empty():return platforms
+	var ids={}
+	for y in range(floori(bounds.position.y/128),floori(bounds.end.y/128)+1):
+		for x in range(floori(bounds.position.x/128),floori(bounds.end.x/128)+1):
+			for id in grid.get(Vector2i(x,y),[]):ids[id]=true
+	var ordered=ids.keys();ordered.sort()
+	var result: Array=[]
+	for id in ordered:result.append(platforms[id])
+	return result
+
+static func move(p: Dictionary,input: Dictionary,platforms: Array,dt: float,grid: Dictionary={}) -> void:
 	if p.hp<=0:return
 	var v: Vector2=p.v;var pos: Vector2=p.p
 	v.x=move_toward(v.x,float(input.get("x",0))*SPEED,(2200.0 if p.ground else 1350.0)*dt)
@@ -61,7 +72,7 @@ static func move(p: Dictionary,input: Dictionary,platforms: Array,dt: float) -> 
 		for iteration in range(3):
 			var moved=false
 			var bounds=Rect2(pos-Vector2(15,25),Vector2(30,50))
-			for shape in platforms:
+			for shape in nearby_shapes(platforms,grid,bounds):
 				if shape is Dictionary and not bounds.intersects(shape.bounds):continue
 				var correction=penetration(pos,Vector2(15,25),shape)
 				if correction.length_squared()<0.000001:continue
@@ -140,7 +151,7 @@ static func tick(state: Dictionary,inputs: Dictionary,history: Array,arena_overr
 				state.players[id]=fresh
 			continue
 		p.shield=maxf(0,p.shield-DT);p.cool=maxf(0,p.cool-DT);p.grenade_cd=maxf(0,p.grenade_cd-DT)
-		move(p,input,map.platforms,DT)
+		move(p,input,map.platforms,DT,map.get("collision_grid",{}))
 		var requested=clampi(int(input.get("weapon",-1)),-1,WEAPONS.size()-1)
 		if requested>=0 and p.owned[requested] and requested!=p.weapon:p.weapon=requested;p.reload=0.0
 		var weapon=int(p.weapon)

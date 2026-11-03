@@ -1,5 +1,7 @@
 # Vercel + Render Free deployment
 
+Current production website: https://skybreak-zeta.vercel.app/. Multiplayer health endpoint: https://skybreak-multiplayer.onrender.com/health. Both use free plans. Vercel rebuilds when `main` is pushed; after changing Render configuration or game/server code, verify its deployed commit in the Render dashboard and manually deploy the latest commit if its automatic deployment has not run.
+
 ## 1. Upload to GitHub
 
 Use the repository `https://github.com/Alexwatson-de/Skybreak`. Commit source, lockfile, original assets, license notices, cloud configuration, and the small Godot web export template in `vendor/`. Exclude downloaded engines, dependencies, generated builds, CLI credentials, `.env`, and service-account private keys.
@@ -32,6 +34,8 @@ Import the same GitHub repository into an existing **Hobby** workspace. Framewor
 Add the production environment variable `SKYBREAK_LOBBY_URL=https://YOUR_RENDER_HOST`, then deploy. The build downloads the pinned official Godot 4.5.1 Linux engine, checks its SHA-256, imports the project, exports the game using the vendored web template, and writes public `lobby.json`. It fails rather than silently shipping a production client pointed at localhost. Development auto-player URL controls are disabled in Vercel builds.
 
 WebAssembly is gzip-compressed ahead of time; Vercel rewrites its public URL to the compressed file with the correct encoding and MIME headers. Keep HTML/configuration revalidated to avoid mixing old clients and new deployments.
+
+Production packaging removes the uncompressed WASM artifact: physical files take precedence over Vercel rewrites. Keeping the raw file with a gzip response header breaks engine startup. A verification download with `curl --compressed` must decode to the WASM magic bytes `00 61 73 6d`.
 
 Once Vercel assigns its final production URL, set that exact origin as Render's `WEB_URL` and redeploy Render. This completes the browser origin allowlist and makes invite links open the live website. Do not allow every `*.vercel.app` domain. Add exact preview origins only when you want those deployments to reach the server.
 

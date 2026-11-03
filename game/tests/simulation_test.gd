@@ -25,6 +25,20 @@ func step(s: Dictionary,inputs: Dictionary={},count: int=1) -> Array:
 	return events
 
 func _initialize() -> void:
+	for map_id in range(3):
+		var map=Maps.data(map_id)
+		var equivalent=true
+		for spawn in map.spawns:
+			var full=Sim.player(1,"Full",0,0,spawn)
+			var indexed=full.duplicate(true)
+			for tick in range(180):
+				var intent=Sim.blank()
+				intent.x=1.0 if tick<90 else -1.0
+				intent.jump=tick%45==0;intent.jet=tick%80<20
+				Sim.move(full,intent,map.platforms,Sim.DT)
+				Sim.move(indexed,intent,map.platforms,Sim.DT,map.collision_grid)
+				if full.p.distance_to(indexed.p)>0.01 or full.v.distance_to(indexed.v)>0.01:equivalent=false
+		check(equivalent,"spatial collision index preserves movement on map "+str(map_id))
 	var p=Sim.player(1,"One",0,0,Vector2(100,100));var input=Sim.blank();input.x=1.0
 	for j in range(120):Sim.move(p,input,[floor_shape],Sim.DT)
 	check(p.p.x>400 and absf(p.v.x)<=Sim.SPEED,"movement accelerates without exceeding speed limit")

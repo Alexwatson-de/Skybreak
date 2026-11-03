@@ -165,6 +165,7 @@ func stop(clear_join: bool=true) -> void:
 	reconnect_until=0
 	recovering_session=false
 	status="OFFLINE"
+	for key in metrics:metrics[key]=0
 	if clear_join: join_info={}
 
 func _connected() -> void:
@@ -364,7 +365,8 @@ func send_input(input: Dictionary) -> void:
 	else:
 		submit_input.rpc_id(1,input)
 		if not prediction.is_empty():
-			GameSim.move(prediction,input,ArenaMaps.data(map_id).platforms,GameSim.DT)
+			var map=ArenaMaps.data(map_id)
+			GameSim.move(prediction,input,map.platforms,GameSim.DT,map.collision_grid)
 			pending.append(input.duplicate())
 			if pending.size()>120: pending.pop_front()
 
@@ -429,7 +431,8 @@ func snapshot(packed: PackedByteArray, raw_size: int) -> void:
 		var previous_position: Vector2=prediction.get("p",authoritative.p)
 		prediction=authoritative.duplicate(true)
 		pending=pending.filter(func(i): return i.seq>authoritative.seq)
-		for input in pending: GameSim.move(prediction,input,ArenaMaps.data(map_id).platforms,GameSim.DT)
+		var map=ArenaMaps.data(map_id)
+		for input in pending: GameSim.move(prediction,input,map.platforms,GameSim.DT,map.collision_grid)
 		var correction=previous_position-prediction.p
 		visual_error=(visual_error+correction).limit_length(80) if correction.length()<160 and authoritative.hp>0 else Vector2.ZERO
 	if previous!=state.phase: changed.emit()
