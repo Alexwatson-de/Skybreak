@@ -8,6 +8,8 @@ Live game: **https://skybreak-zeta.vercel.app/**. Source: [Alexwatson-de/Skybrea
 
 The website runs the actual Godot game. Choose **Play Online**, create a room or join a code/invite, chat, choose teams, ready up, and let the host start. Practice against three bots is also available. A keyboard and mouse are required; mobile touch controls have not been implemented.
 
+Graphics default to Auto, which adjusts resolution during a slow match. Use **Connection details → Graphics quality** to choose Low for faster rendering or High for sharper graphics. This setting is saved in your browser and does not change movement, collision, weapons or server validation.
+
 Vercel serves the browser client. A Render **Free** Docker service runs the Node.js/TypeScript/Socket.IO lobby and a dedicated Godot process per match. Browser and current native online clients use WebSocket/WSS through the same public HTTPS port. Native Wi-Fi/hotspot hosting continues to use ENet. All modes share `game/scripts/sim.gd`; no game rules are reimplemented in the website.
 
 Free Render hosting sleeps after 15 minutes without traffic. The first connection can take about a minute to wake. The client shows a wake-up state and retries with backoff. Free usage limits apply; no paid plan or payment method is required by the project. Rooms and match state are in memory, so a server restart ends active matches.

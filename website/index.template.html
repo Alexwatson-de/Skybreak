@@ -16,7 +16,7 @@
     <section id="loader" aria-live="polite"><p class="eyebrow">ENTER THE UNDERGROUND / 1.2</p><h1>Outfly. Outfight.</h1><p id="load-message">Preparing your arena. The first download may take a moment.</p><progress id="load-progress" aria-label="Game download progress"></progress><p class="small">Three battlefields. Six guns. One squad.</p><button id="retry" hidden type="button">Try again</button></section>
   </main>
   <footer><p><kbd>A</kbd><kbd>D</kbd> move <kbd>Space</kbd> jump <kbd>W</kbd> jetpack <span class="desktop">Mouse aim / fire</span> <kbd>E</kbd> pick up <kbd>Q</kbd> grenade <kbd>G</kbd> throw</p><button id="diagnostics-toggle" aria-expanded="false" aria-controls="diagnostics" type="button">Connection details</button></footer>
-  <aside id="diagnostics" hidden><p id="server-message">Connecting only starts when you choose Play Online.</p><pre id="live-metrics">No match yet.</pre></aside>
+  <aside id="diagnostics" hidden><p id="server-message">Connecting only starts when you choose Play Online.</p><label for="quality">Graphics quality </label><select id="quality"><option value="auto">Auto — adapt for smoother play</option><option value="low">Low — faster rendering</option><option value="high">High — sharper graphics</option></select><p id="quality-status" role="status"></p><pre id="live-metrics">No match yet.</pre></aside>
   <p class="mobile-note">Keyboard and mouse are required. Touch controls are planned for a later update.</p>
   <noscript>Enable JavaScript to play Skybreak Arena.</noscript>
   <script src="index.js"></script>

@@ -4,9 +4,38 @@
   const $ = id => document.getElementById(id);
   const config = window.GODOT_CONFIG;
   const params = new URLSearchParams(location.search);
+  let resizeCanvas = () => {};
+  let quality = 'auto';
+  let autoWidth = 1280;
+  let slowFrames = 0;
+  let fastFrames = 0;
+  try { quality = localStorage.getItem('skybreak.graphics') || 'auto'; } catch {}
+  if (!['auto', 'low', 'high'].includes(quality)) quality = 'auto';
+  $('quality').value = quality;
+  $('quality').addEventListener('change', () => {
+    quality = $('quality').value;
+    autoWidth = 1280;
+    slowFrames = fastFrames = 0;
+    try { localStorage.setItem('skybreak.graphics', quality); } catch {}
+    resizeCanvas();
+  });
   window.Skybreak = {
     update(report) {
       const playing = ['match', 'results'].includes(report.phase);
+      // Hidden tabs are browser-throttled; their FPS must not lower quality.
+      if (quality === 'auto' && playing && !document.hidden && report.fps > 0) {
+        slowFrames = report.fps < 30 ? slowFrames + 1 : 0;
+        fastFrames = report.fps > 55 ? fastFrames + 1 : 0;
+        if (slowFrames >= 4 && autoWidth > 800) {
+          autoWidth = Math.max(800, autoWidth - 160);
+          slowFrames = fastFrames = 0;
+          resizeCanvas();
+        } else if (fastFrames >= 15 && autoWidth < 1280) {
+          autoWidth = Math.min(1280, autoWidth + 160);
+          slowFrames = fastFrames = 0;
+          resizeCanvas();
+        }
+      }
       const status = playing ? `${report.status} · ${report.ping_ms} ms` : report.lobby_status !== 'OFFLINE' ? report.lobby_status : 'Ready to play';
       $('connection-summary').textContent = status;
       $('connection-light').classList.toggle('online', report.status.startsWith('CONNECTED') || report.lobby_status.startsWith('CONNECTED'));
@@ -49,14 +78,20 @@
     config.args = args;
     config.canvasResizePolicy = 0;
     const canvas = $('canvas');
-    const resize = () => {
+    resizeCanvas = () => {
       const rect = canvas.getBoundingClientRect();
-      const ratio = Math.min(devicePixelRatio || 1, 1.5);
-      canvas.width = Math.round(rect.width * ratio);
-      canvas.height = Math.round(rect.height * ratio);
+      if (!rect.width || !rect.height) return;
+      const budget = quality === 'high' ? 1920 : quality === 'low' ? 800 : autoWidth;
+      const ratio = Math.min(devicePixelRatio || 1, budget / rect.width, (budget / 1.6) / rect.height);
+      const width = Math.max(1, Math.round(rect.width * ratio));
+      const height = Math.max(1, Math.round(rect.height * ratio));
+      // Reassigning even the same size clears WebGL's drawing buffer.
+      if (canvas.width !== width) canvas.width = width;
+      if (canvas.height !== height) canvas.height = height;
+      $('quality-status').textContent = `${quality === 'auto' ? 'Auto' : quality === 'low' ? 'Low' : 'High'} graphics · ${width} × ${height}`;
     };
-    resize();
-    new ResizeObserver(resize).observe($('stage'));
+    resizeCanvas();
+    new ResizeObserver(resizeCanvas).observe($('stage'));
     config.ensureCrossOriginIsolationHeaders = false;
     const missing = Engine.getMissingFeatures({ threads: false });
     if (missing.length) throw new Error(`Missing browser features: ${missing.join(', ')}`);
