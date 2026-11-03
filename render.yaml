@@ -12,9 +12,5 @@ services:
         value: websocket
       - key: MAX_ROOMS
         value: "2"
-      - key: PUBLIC_URL
-        sync: false
       - key: WEB_URL
-        sync: false
-      - key: ALLOWED_ORIGINS
         sync: false
