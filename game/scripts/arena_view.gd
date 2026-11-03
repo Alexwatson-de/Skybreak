@@ -17,6 +17,17 @@ var hurt_flash=0.0
 var pickup_label=""
 var pickup_until=0.0
 var font=ThemeDB.fallback_font
+var touch_points: Dictionary={}
+var touch_aim=Vector2.ZERO
+
+const TOUCH_STICK=Vector2(150,760)
+const TOUCH_JUMP=Vector2(1265,596)
+const TOUCH_JET=Vector2(1350,680)
+const TOUCH_FIRE=Vector2(1175,594)
+const TOUCH_CROUCH=Vector2(330,790)
+const TOUCH_GRENADE=Vector2(1090,730)
+const TOUCH_RELOAD=Vector2(990,730)
+const TOUCH_PICKUP=Vector2(890,730)
 
 func _ready() -> void:
 	if DisplayServer.get_name()=="headless":
@@ -63,7 +74,80 @@ func _process(delta: float) -> void:
 	else:
 		zoom=0.53;origin=Vector2(1000,435)-Vector2(1690,870)*zoom
 	terrain.position=origin;terrain.scale=Vector2.ONE*zoom
+	update_touch_intent(playing)
 	queue_redraw()
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not main.mobile_controls_active(): return
+	if event is InputEventScreenTouch:
+		if event.pressed: touch_points[event.index]=event.position
+		else: touch_points.erase(event.index)
+		get_viewport().set_input_as_handled()
+	elif event is InputEventScreenDrag:
+		touch_points[event.index]=event.position
+		get_viewport().set_input_as_handled()
+
+func in_touch_button(point: Vector2, center: Vector2, radius: float=46.0) -> bool:
+	return point.distance_to(center)<=radius
+
+func update_touch_intent(playing: bool) -> void:
+	if not main.mobile_controls_active(): return
+	var intent=GameSim.blank()
+	if not playing or main.paused:
+		main.controls.touch_intent=intent
+		return
+	var stick=Vector2.ZERO
+	var aiming=false
+	var selected_weapon=-1
+	for point in touch_points.values():
+		# Weapon cells remain reachable through the lower HUD.
+		if point.y>=795 and point.y<=890 and point.x>=304 and point.x<1060:
+			selected_weapon=clampi(int((point.x-304)/124),0,5)
+			continue
+		if in_touch_button(point,TOUCH_JUMP): intent.jump=true;continue
+		if in_touch_button(point,TOUCH_JET): intent.jet=true;continue
+		if in_touch_button(point,TOUCH_CROUCH): intent.crouch=true;continue
+		if in_touch_button(point,TOUCH_GRENADE): intent.grenade=true;continue
+		if in_touch_button(point,TOUCH_RELOAD): intent.reload=true;continue
+		if in_touch_button(point,TOUCH_PICKUP): intent.interact=true;continue
+		if point.x<430 and point.y>570:
+			stick=(point-TOUCH_STICK)/92.0
+			continue
+		# A free touch on the right half aims and fires. This preserves two-thumb
+		# movement + firing while allowing the action buttons to be held separately.
+		if point.x>470:
+			touch_aim=point;aiming=true;intent.fire=true
+	if selected_weapon>=0: main.controls.weapon=selected_weapon
+	intent.x=clampf(stick.x,-1.0,1.0)
+	if stick.y<-0.42: intent.jump=true
+	if stick.y>0.54: intent.crouch=true
+	var local=Net.render_players().get(Net.local_id,{})
+	if aiming and not local.is_empty():
+		intent.aim=(touch_aim-(origin+local.p*zoom)).angle()
+	elif not local.is_empty(): intent.aim=float(local.get("aim",0.0))
+	main.controls.touch_intent=intent
+
+func touch_button(center: Vector2, radius: float, text: String, active: bool=false) -> void:
+	var fill=Color("e1b96f",0.74) if active else Color("17231b",0.88)
+	draw_circle(center,radius,fill)
+	draw_arc(center,radius,0,TAU,40,Color("f3d99d") if active else Color("718069"),2.0,true)
+	var width=font.get_string_size(text,HORIZONTAL_ALIGNMENT_CENTER,-1,13).x
+	text_at(center+Vector2(-width/2,5),text,13,Color("25291d") if active else Color("e4e0c8"))
+
+func touch_controls() -> void:
+	if not main.mobile_controls_active() or not Net.active or Net.state.get("phase","")!="match": return
+	var stick=Vector2.ZERO
+	for point in touch_points.values():
+		if point.x<430 and point.y>570: stick=(point-TOUCH_STICK).limit_length(70)
+	draw_circle(TOUCH_STICK,76,Color("101810",0.45));draw_arc(TOUCH_STICK,76,0,TAU,36,Color("8f9c7a",0.65),2,true)
+	draw_circle(TOUCH_STICK+stick,29,Color("d8bd7b",0.72))
+	touch_button(TOUCH_JUMP,42,"JUMP")
+	touch_button(TOUCH_JET,45,"JET",main.controls.touch_intent.get("jet",false))
+	touch_button(TOUCH_FIRE,45,"FIRE",main.controls.touch_intent.get("fire",false))
+	touch_button(TOUCH_CROUCH,38,"CROUCH",main.controls.touch_intent.get("crouch",false))
+	touch_button(TOUCH_GRENADE,37,"GRENADE",main.controls.touch_intent.get("grenade",false))
+	touch_button(TOUCH_RELOAD,35,"RELOAD",main.controls.touch_intent.get("reload",false))
+	touch_button(TOUCH_PICKUP,35,"PICK UP",main.controls.touch_intent.get("interact",false))
 
 func text_at(pos: Vector2,text: String,size: int=16,color: Color=Color("d8d5be")) -> void:
 	draw_string(font,pos,text,HORIZONTAL_ALIGNMENT_LEFT,-1,size,color)
@@ -161,6 +245,7 @@ func _draw() -> void:
 		draw_rect(Rect2(point+Vector2(-20,-47),Vector2(40,3)),Color("33372e"))
 		draw_rect(Rect2(point+Vector2(-20,-47),Vector2(p.hp*0.4,3)),color)
 	hud(players.get(Net.local_id,{}),map)
+	touch_controls()
 
 func draw_armory() -> void:
 	var item=main.selected_armory

@@ -6,7 +6,19 @@ An original Godot 4.5.1 jetpack arena shooter with a browser client, native LAN 
 
 Live game: **https://skybreak-zeta.vercel.app/**. Source: [Alexwatson-de/Skybreak](https://github.com/Alexwatson-de/Skybreak). The multiplayer service runs at `https://skybreak-multiplayer.onrender.com`.
 
-The website runs the actual Godot game. Choose **Play Online**, create a room or join a code/invite, chat, choose teams, ready up, and let the host start. Practice against three bots is also available. A keyboard and mouse are required; mobile touch controls have not been implemented.
+The website runs the actual Godot game. Choose **Play Online**, create a room or join a code/invite, chat, choose teams, ready up, and let the host start. Practice against three bots is also available. Desktop supports keyboard/mouse; Android uses a native landscape touch layout.
+
+## Android APK
+
+The Android build uses the same Godot simulation, LAN ENet play, and online WebSocket match client as desktop/web. In a match, use the left stick to move (push up to jump and down to crawl), drag/touch the open right side to aim and fire, and use the on-screen **Jump**, **Jet**, **Crouch**, **Grenade**, **Reload**, **Pick up**, and weapon-rack controls. The server still validates movement, shooting, health, ammunition, kills, and scores.
+
+Prerequisites: Godot 4.5 Android export templates, Android SDK platform 35/build-tools, and a Java 17+ JDK. Set Godot's Android SDK and debug keystore paths in Editor Settings, then run:
+
+```sh
+GODOT_BIN=/path/to/Godot bash scripts/build_android.sh
+```
+
+The resulting installable APK is `builds/android/Skybreak-Arena.apk`. Install it with `adb install -r builds/android/Skybreak-Arena.apk`, or transfer it to an Android device and allow installation from your file manager. Android local Wi-Fi/hostpot rooms require the same network and the host's reachable LAN IP.
 
 The interface stays at native display resolution. **Connection details → Graphics quality** adjusts the terrain detail without downscaling labels, avatars or the HUD. Auto reduces world detail during slower matches; Low and High are also available.
 

@@ -41,6 +41,12 @@ var browser_report_at=0.0
 var chat_draft=""
 var chat_entry: LineEdit
 
+func mobile_controls_active() -> bool:
+	# --touch is useful for desktop QA, while exported Android builds enable this
+	# automatically. The controls still submit the same intent dictionary as a
+	# keyboard/mouse player, so the server remains authoritative.
+	return OS.has_feature("mobile") or args.has("touch")
+
 func _ready() -> void:
 	if DisplayServer.get_name()=="headless":Engine.max_fps=60
 	for item in OS.get_cmdline_user_args():
@@ -110,6 +116,7 @@ func _ready() -> void:
 	elif args.has("demo"): practice()
 	elif args.has("screen"): screen=str(args.screen)
 	if args.has("scan"): Net.scan_lan()
+	controls.touch_enabled=mobile_controls_active()
 	build_ui()
 
 func save_settings() -> void:
