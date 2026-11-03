@@ -1,0 +1,36 @@
+; Skybreak Arena — original game, Godot 4.5+
+config_version=5
+
+[application]
+config/name="Skybreak Arena"
+config/version="1.2.0"
+config/use_custom_user_dir=true
+config/custom_user_dir_name="Skybreak Arena"
+run/main_scene="res://main.tscn"
+config/features=PackedStringArray("4.5", "GL Compatibility")
+config/icon="res://assets/icon.svg"
+
+[autoload]
+Net="*res://scripts/net.gd"
+Lobby="*res://scripts/lobby.gd"
+
+[display]
+window/size/viewport_width=1440
+window/size/viewport_height=900
+window/size/window_width_override=1280
+window/size/window_height_override=800
+window/stretch/mode="canvas_items"
+
+[rendering]
+renderer/rendering_method="gl_compatibility"
+environment/defaults/default_clear_color=Color(0.024,0.043,0.067,1)
+textures/default_filters/use_nearest_mipmap_filter=false
+textures/vram_compression/import_etc2_astc=true
+
+[physics]
+common/physics_ticks_per_second=60
+
+[debug]
+file_logging/enable_file_logging=false
+file_logging/enable_file_logging.pc=false
+gdscript/warnings/inference_on_variant=0

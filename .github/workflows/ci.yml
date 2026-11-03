@@ -1,0 +1,44 @@
+name: Game and browser checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - name: Build browser export from Godot source
+        run: bash scripts/build_web.sh
+      - name: Verify authoritative simulation
+        run: .runtime/Godot_v4.5.1-stable_linux.x86_64 --headless --path game --script tests/simulation_test.gd
+      - name: Build lobby
+        run: npm ci && npm run build
+        working-directory: backend
+      - name: Verify native ENet networking
+        run: npm test
+        working-directory: backend
+        env:
+          GODOT_BIN: ${{ github.workspace }}/.runtime/Godot_v4.5.1-stable_linux.x86_64
+      - name: Verify browser WebSocket networking and reconnection
+        run: npm test
+        working-directory: backend
+        env:
+          GODOT_BIN: ${{ github.workspace }}/.runtime/Godot_v4.5.1-stable_linux.x86_64
+          GAME_TRANSPORT: websocket
+      - name: Verify delayed match startup recovery
+        run: python3 scripts/test_join_retry.py
+        env:
+          GODOT_BIN: ${{ github.workspace }}/.runtime/Godot_v4.5.1-stable_linux.x86_64

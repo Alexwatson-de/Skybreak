@@ -1,0 +1,15 @@
+.runtime/
+.cache/
+backend/node_modules/
+backend/dist/
+game/.godot/
+builds/
+*.log
+.env
+.env.*
+!.env.example
+.vercel/
+*.pem
+*service-account*.json
+.runtime-linux/
+.DS_Store

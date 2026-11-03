@@ -1,0 +1,107 @@
+{
+  "discovered": {
+
+  },
+  "lobby_status": "OFFLINE",
+  "local_id": 1,
+  "metrics": {
+    "hits": 11,
+    "kills": 2,
+    "max_snapshot_bytes": 569,
+    "reconnects": 0,
+    "rejected": 0,
+    "shots": 36,
+    "snapshots": 0
+  },
+  "phase": "results",
+  "ping_ms": 0,
+  "players": [
+    {
+      "ammo": [
+        7,
+        17,
+        0,
+        0,
+        0,
+        0
+      ],
+      "deaths": 0,
+      "hp": 100,
+      "id": 1,
+      "kills": 0,
+      "name": "Pilot",
+      "online": true,
+      "position": [
+        979.885314941406,
+        713.933837890625
+      ],
+      "seq": 180
+    },
+    {
+      "ammo": [
+        12,
+        0,
+        0,
+        0,
+        4,
+        0
+      ],
+      "deaths": 1,
+      "hp": 0,
+      "id": 100,
+      "kills": 0,
+      "name": "Moss",
+      "online": true,
+      "position": [
+        2307.10546875,
+        694.921020507812
+      ],
+      "seq": 0
+    },
+    {
+      "ammo": [
+        12,
+        0,
+        0,
+        0,
+        0,
+        7
+      ],
+      "deaths": 1,
+      "hp": 0,
+      "id": 101,
+      "kills": 0,
+      "name": "Rivet",
+      "online": true,
+      "position": [
+        1849.75,
+        948.616088867188
+      ],
+      "seq": 0
+    },
+    {
+      "ammo": [
+        12,
+        18,
+        0,
+        0,
+        0,
+        0
+      ],
+      "deaths": 0,
+      "hp": 61,
+      "id": 102,
+      "kills": 2,
+      "name": "Nova",
+      "online": true,
+      "position": [
+        1916.69189453125,
+        980.648681640625
+      ],
+      "seq": 0
+    }
+  ],
+  "room": "",
+  "status": "PRACTICE · LOCAL SIMULATION",
+  "time": 3.01666666666666
+}

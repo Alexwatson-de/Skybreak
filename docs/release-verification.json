@@ -1,0 +1,34 @@
+{
+  "release": "1.1",
+  "platform": "macOS",
+  "architectures": [
+    "x86_64",
+    "arm64"
+  ],
+  "signing": "ad-hoc; not Apple notarized",
+  "checks": {
+    "dmg_crc": "VALID",
+    "zip_crc": "passed",
+    "extracted_app_signature_all_architectures": "passed",
+    "executable_permissions": "0755",
+    "extracted_app_practice": "results; 11 hits; 2 kills",
+    "extracted_clients_online": "passed; 2 ENet clients; 22 hits; 2 kills; 1 reconnect",
+    "simulation": "45 checks; 0 failures",
+    "capacity": "8 clients on each of 3 maps"
+  },
+  "limits": [
+    "Image filesystem extracted without mounting; device attachment unavailable in build sandbox",
+    "Recipient physical Mac not tested",
+    "No public Internet server deployed"
+  ],
+  "artifacts": {
+    "Skybreak-Arena-1.1-macOS.dmg": {
+      "sha256": "6ef31d8040e0b70cd96216434221b6080c5b0845b1b0883fba3ceacd54f9cd4f",
+      "bytes": 69129237
+    },
+    "Skybreak-Arena-1.1-macOS.zip": {
+      "sha256": "4a17bd16df842e91645372f4d5e1e2db5bf427dab50d5f84c396e6aff58a789f",
+      "bytes": 62554040
+    }
+  }
+}

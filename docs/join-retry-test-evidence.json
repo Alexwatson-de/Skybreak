@@ -1,0 +1,45 @@
+{
+  "discovered": {},
+  "lobby_status": "OFFLINE",
+  "local_id": 1,
+  "map": 0,
+  "metrics": {
+    "hits": 0,
+    "kills": 0,
+    "max_snapshot_bytes": 0,
+    "reconnects": 0,
+    "rejected": 0,
+    "shots": 0,
+    "snapshots": 136
+  },
+  "phase": "match",
+  "ping_ms": 19,
+  "players": [
+    {
+      "ammo": [
+        12,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "deaths": 0,
+      "hp": 100,
+      "id": 1,
+      "kills": 0,
+      "name": "RetryPilot",
+      "online": true,
+      "position": [
+        266.806213378906,
+        332.487762451172
+      ],
+      "seq": 406
+    }
+  ],
+  "room": "",
+  "screen": "game",
+  "status": "CONNECTED \u00b7 ONLINE",
+  "time": 6.99999999999998,
+  "transport": "websocket"
+}

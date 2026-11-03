@@ -1,0 +1,7 @@
+.runtime
+.cache
+builds
+backend/node_modules
+backend/dist
+game/.godot
+.git

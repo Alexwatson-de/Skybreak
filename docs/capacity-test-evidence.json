@@ -1,0 +1,569 @@
+{
+  "0": {
+    "discovered": {},
+    "lobby_status": "OFFLINE",
+    "local_id": 0,
+    "metrics": {
+      "hits": 32,
+      "kills": 3,
+      "max_snapshot_bytes": 829,
+      "reconnects": 0,
+      "rejected": 0,
+      "shots": 212,
+      "snapshots": 0
+    },
+    "phase": "match",
+    "ping_ms": 0,
+    "players": [
+      {
+        "ammo": [
+          7,
+          30,
+          0,
+          0,
+          0,
+          0
+        ],
+        "deaths": 0,
+        "hp": 10,
+        "id": 1,
+        "kills": 0,
+        "name": "Pilot1",
+        "online": false,
+        "position": [
+          1371.1357421875,
+          1059.68774414062
+        ],
+        "seq": 412
+      },
+      {
+        "ammo": [
+          10,
+          0,
+          5,
+          0,
+          0,
+          0
+        ],
+        "deaths": 0,
+        "hp": 61,
+        "id": 2,
+        "kills": 1,
+        "name": "Pilot2",
+        "online": false,
+        "position": [
+          1445.0,
+          1213.21203613281
+        ],
+        "seq": 406
+      },
+      {
+        "ammo": [
+          5,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "deaths": 1,
+        "hp": 100,
+        "id": 5,
+        "kills": 0,
+        "name": "Pilot5",
+        "online": false,
+        "position": [
+          2535.9970703125,
+          343.627014160156
+        ],
+        "seq": 403
+      },
+      {
+        "ammo": [
+          5,
+          0,
+          0,
+          0,
+          5,
+          0
+        ],
+        "deaths": 0,
+        "hp": 87,
+        "id": 4,
+        "kills": 0,
+        "name": "Pilot4",
+        "online": false,
+        "position": [
+          1485.83227539062,
+          1178.94958496094
+        ],
+        "seq": 403
+      },
+      {
+        "ammo": [
+          3,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "deaths": 0,
+        "hp": 52,
+        "id": 8,
+        "kills": 0,
+        "name": "Pilot8",
+        "online": false,
+        "position": [
+          1733.73693847656,
+          1701.91809082031
+        ],
+        "seq": 391
+      },
+      {
+        "ammo": [
+          3,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "deaths": 0,
+        "hp": 76,
+        "id": 7,
+        "kills": 0,
+        "name": "Pilot7",
+        "online": false,
+        "position": [
+          1515.11181640625,
+          1708.4560546875
+        ],
+        "seq": 395
+      },
+      {
+        "ammo": [
+          10,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "deaths": 1,
+        "hp": 100,
+        "id": 6,
+        "kills": 1,
+        "name": "Pilot6",
+        "online": false,
+        "position": [
+          1215.62561035156,
+          1050.06079101562
+        ],
+        "seq": 383
+      },
+      {
+        "ammo": [
+          9,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "deaths": 1,
+        "hp": 0,
+        "id": 3,
+        "kills": 1,
+        "name": "Pilot3",
+        "online": false,
+        "position": [
+          1581.97485351562,
+          897.440673828125
+        ],
+        "seq": 383
+      }
+    ],
+    "room": "",
+    "status": "DEDICATED SERVER",
+    "time": 9.61666666666672
+  },
+  "1": {
+    "discovered": {},
+    "lobby_status": "OFFLINE",
+    "local_id": 0,
+    "metrics": {
+      "hits": 29,
+      "kills": 4,
+      "max_snapshot_bytes": 847,
+      "reconnects": 0,
+      "rejected": 0,
+      "shots": 258,
+      "snapshots": 0
+    },
+    "phase": "match",
+    "ping_ms": 0,
+    "players": [
+      {
+        "ammo": [
+          6,
+          30,
+          0,
+          0,
+          0,
+          0
+        ],
+        "deaths": 0,
+        "hp": 17,
+        "id": 1,
+        "kills": 0,
+        "name": "Pilot1",
+        "online": false,
+        "position": [
+          1623.33325195312,
+          827.066284179688
+        ],
+        "seq": 410
+      },
+      {
+        "ammo": [
+          10,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "deaths": 1,
+        "hp": 0,
+        "id": 2,
+        "kills": 0,
+        "name": "Pilot2",
+        "online": false,
+        "position": [
+          1597.68591308594,
+          690.714538574219
+        ],
+        "seq": 416
+      },
+      {
+        "ammo": [
+          2,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "deaths": 1,
+        "hp": 100,
+        "id": 5,
+        "kills": 0,
+        "name": "Pilot5",
+        "online": false,
+        "position": [
+          1988.93151855469,
+          1005.61956787109
+        ],
+        "seq": 414
+      },
+      {
+        "ammo": [
+          9,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "deaths": 1,
+        "hp": 100,
+        "id": 7,
+        "kills": 0,
+        "name": "Pilot7",
+        "online": false,
+        "position": [
+          2208.37060546875,
+          1483.79541015625
+        ],
+        "seq": 417
+      },
+      {
+        "ammo": [
+          10,
+          19,
+          0,
+          29,
+          0,
+          0
+        ],
+        "deaths": 0,
+        "hp": 13,
+        "id": 6,
+        "kills": 1,
+        "name": "Pilot6",
+        "online": false,
+        "position": [
+          1789.43176269531,
+          1539.328125
+        ],
+        "seq": 418
+      },
+      {
+        "ammo": [
+          10,
+          0,
+          0,
+          12,
+          0,
+          0
+        ],
+        "deaths": 0,
+        "hp": 100,
+        "id": 3,
+        "kills": 2,
+        "name": "Pilot3",
+        "online": false,
+        "position": [
+          1656.04919433594,
+          794.727172851562
+        ],
+        "seq": 416
+      },
+      {
+        "ammo": [
+          9,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "deaths": 1,
+        "hp": 0,
+        "id": 4,
+        "kills": 0,
+        "name": "Pilot4",
+        "online": false,
+        "position": [
+          1565.34313964844,
+          626.032958984375
+        ],
+        "seq": 415
+      },
+      {
+        "ammo": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "deaths": 0,
+        "hp": 100,
+        "id": 8,
+        "kills": 1,
+        "name": "Pilot8",
+        "online": false,
+        "position": [
+          1734.63537597656,
+          1545.28259277344
+        ],
+        "seq": 416
+      }
+    ],
+    "room": "",
+    "status": "DEDICATED SERVER",
+    "time": 9.80000000000007
+  },
+  "2": {
+    "discovered": {},
+    "lobby_status": "OFFLINE",
+    "local_id": 0,
+    "metrics": {
+      "hits": 38,
+      "kills": 5,
+      "max_snapshot_bytes": 842,
+      "reconnects": 0,
+      "rejected": 0,
+      "shots": 222,
+      "snapshots": 0
+    },
+    "phase": "match",
+    "ping_ms": 0,
+    "players": [
+      {
+        "ammo": [
+          6,
+          0,
+          0,
+          23,
+          0,
+          0
+        ],
+        "deaths": 0,
+        "hp": 6,
+        "id": 3,
+        "kills": 2,
+        "name": "Pilot3",
+        "online": false,
+        "position": [
+          1554.85205078125,
+          1209.21789550781
+        ],
+        "seq": 415
+      },
+      {
+        "ammo": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "deaths": 1,
+        "hp": 100,
+        "id": 5,
+        "kills": 0,
+        "name": "Pilot5",
+        "online": false,
+        "position": [
+          1795.80578613281,
+          1210.79089355469
+        ],
+        "seq": 414
+      },
+      {
+        "ammo": [
+          10,
+          0,
+          1,
+          0,
+          0,
+          0
+        ],
+        "deaths": 1,
+        "hp": 0,
+        "id": 2,
+        "kills": 0,
+        "name": "Pilot2",
+        "online": false,
+        "position": [
+          1710.66540527344,
+          1083.86779785156
+        ],
+        "seq": 412
+      },
+      {
+        "ammo": [
+          9,
+          27,
+          0,
+          0,
+          0,
+          0
+        ],
+        "deaths": 0,
+        "hp": 89,
+        "id": 1,
+        "kills": 1,
+        "name": "Pilot1",
+        "online": false,
+        "position": [
+          1573.43835449219,
+          1206.90014648438
+        ],
+        "seq": 410
+      },
+      {
+        "ammo": [
+          7,
+          0,
+          0,
+          18,
+          0,
+          0
+        ],
+        "deaths": 0,
+        "hp": 28,
+        "id": 8,
+        "kills": 1,
+        "name": "Pilot8",
+        "online": false,
+        "position": [
+          1567.982421875,
+          1709.80065917969
+        ],
+        "seq": 416
+      },
+      {
+        "ammo": [
+          7,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "deaths": 1,
+        "hp": 100,
+        "id": 6,
+        "kills": 1,
+        "name": "Pilot6",
+        "online": false,
+        "position": [
+          982.133056640625,
+          1370.35900878906
+        ],
+        "seq": 410
+      },
+      {
+        "ammo": [
+          9,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "deaths": 1,
+        "hp": 0,
+        "id": 7,
+        "kills": 0,
+        "name": "Pilot7",
+        "online": false,
+        "position": [
+          1374.19836425781,
+          1452.69372558594
+        ],
+        "seq": 415
+      },
+      {
+        "ammo": [
+          10,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "deaths": 1,
+        "hp": 76,
+        "id": 4,
+        "kills": 0,
+        "name": "Pilot4",
+        "online": false,
+        "position": [
+          1780.69128417969,
+          1210.4990234375
+        ],
+        "seq": 415
+      }
+    ],
+    "room": "",
+    "status": "DEDICATED SERVER",
+    "time": 9.7833333333334
+  }
+}

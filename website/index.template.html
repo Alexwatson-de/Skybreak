@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#161d17">
+  <meta name="description" content="Free original multiplayer jetpack combat. Explore catacombs, collect weapons, and play deathmatch or team deathmatch with friends in your browser.">
+  <title>Skybreak Arena — Play online</title>
+  <link rel="icon" href="index.icon.png">
+  <link rel="stylesheet" href="site.css">
+</head>
+<body>
+  <header><a class="brand" href="/">SKYBREAK <span>ARENA</span></a><div class="connection"><i id="connection-light"></i><span id="connection-summary" role="status" aria-live="polite">Loading the arena</span></div><button id="fullscreen" type="button">Fullscreen ↗</button></header>
+  <main id="stage">
+    <canvas id="canvas" tabindex="0" aria-label="Skybreak Arena multiplayer game. Keyboard and mouse controls are listed below.">This game requires a browser with WebGL 2.</canvas>
+    <section id="loader" aria-live="polite"><p class="eyebrow">ENTER THE UNDERGROUND / 1.2</p><h1>Outfly. Outfight.</h1><p id="load-message">Preparing your arena. The first download may take a moment.</p><progress id="load-progress" aria-label="Game download progress"></progress><p class="small">Three battlefields. Six guns. One squad.</p><button id="retry" hidden type="button">Try again</button></section>
+  </main>
+  <footer><p><kbd>A</kbd><kbd>D</kbd> move <kbd>Space</kbd> jump <kbd>W</kbd> jetpack <span class="desktop">Mouse aim / fire</span> <kbd>E</kbd> pick up <kbd>Q</kbd> grenade <kbd>G</kbd> throw</p><button id="diagnostics-toggle" aria-expanded="false" aria-controls="diagnostics" type="button">Connection details</button></footer>
+  <aside id="diagnostics" hidden><p id="server-message">Connecting only starts when you choose Play Online.</p><pre id="live-metrics">No match yet.</pre></aside>
+  <p class="mobile-note">Keyboard and mouse are required. Touch controls are planned for a later update.</p>
+  <noscript>Enable JavaScript to play Skybreak Arena.</noscript>
+  <script src="index.js"></script>
+  <script>window.GODOT_CONFIG=__GODOT_CONFIG__;</script>
+  <script src="client.js"></script>
+</body>
+</html>

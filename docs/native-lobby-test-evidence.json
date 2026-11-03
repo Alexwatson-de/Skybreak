@@ -1,0 +1,128 @@
+{
+  "host": {
+    "discovered": {},
+    "lobby_status": "CONNECTED \u00b7 SOCKET.IO",
+    "local_id": 1,
+    "metrics": {
+      "hits": 19,
+      "kills": 3,
+      "max_snapshot_bytes": 0,
+      "reconnects": 0,
+      "rejected": 0,
+      "shots": 135,
+      "snapshots": 224
+    },
+    "phase": "match",
+    "ping_ms": 13,
+    "players": [
+      {
+        "ammo": [
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "deaths": 2,
+        "hp": 0,
+        "id": 1,
+        "kills": 1,
+        "name": "NativeHost",
+        "online": true,
+        "position": [
+          1785.08618164062,
+          876.360473632812
+        ],
+        "seq": 954
+      },
+      {
+        "ammo": [
+          10,
+          0,
+          0,
+          31,
+          0,
+          8
+        ],
+        "deaths": 1,
+        "hp": 56,
+        "id": 2,
+        "kills": 2,
+        "name": "NativeJoin",
+        "online": false,
+        "position": [
+          1411.87316894531,
+          1060.01000976562
+        ],
+        "seq": 864
+      }
+    ],
+    "room": "QZSG7M",
+    "status": "CONNECTED \u00b7 ENet",
+    "time": 16.1500000000004
+  },
+  "client": {
+    "discovered": {},
+    "lobby_status": "CONNECTED \u00b7 SOCKET.IO",
+    "local_id": 2,
+    "metrics": {
+      "hits": 19,
+      "kills": 3,
+      "max_snapshot_bytes": 0,
+      "reconnects": 0,
+      "rejected": 0,
+      "shots": 135,
+      "snapshots": 288
+    },
+    "phase": "match",
+    "ping_ms": 6,
+    "players": [
+      {
+        "ammo": [
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "deaths": 2,
+        "hp": 0,
+        "id": 1,
+        "kills": 1,
+        "name": "NativeHost",
+        "online": true,
+        "position": [
+          1785.08618164062,
+          876.360473632812
+        ],
+        "seq": 864
+      },
+      {
+        "ammo": [
+          10,
+          0,
+          0,
+          31,
+          0,
+          8
+        ],
+        "deaths": 1,
+        "hp": 56,
+        "id": 2,
+        "kills": 2,
+        "name": "NativeJoin",
+        "online": true,
+        "position": [
+          1411.98303222656,
+          1060.00964355469
+        ],
+        "seq": 863
+      }
+    ],
+    "room": "QZSG7M",
+    "status": "CONNECTED \u00b7 ENet",
+    "time": 14.6500000000003
+  }
+}

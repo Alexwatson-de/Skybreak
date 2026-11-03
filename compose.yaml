@@ -1,0 +1,12 @@
+services:
+  skybreak:
+    build: .
+    restart: unless-stopped
+    environment:
+      PUBLIC_GAME_HOST: ${PUBLIC_GAME_HOST:-127.0.0.1}
+      PUBLIC_URL: ${PUBLIC_URL:-http://localhost:3000}
+      MAX_ROOMS: 8
+    ports:
+      - "3000:3000/tcp"
+      - "29500-29507:29500-29507/udp"
+    stop_grace_period: 5s

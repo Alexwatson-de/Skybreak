@@ -1,0 +1,352 @@
+{
+  "host": {
+    "discovered": {},
+    "lobby_status": "OFFLINE",
+    "local_id": 1,
+    "metrics": {
+      "hits": 22,
+      "kills": 4,
+      "max_snapshot_bytes": 568,
+      "reconnects": 0,
+      "rejected": 0,
+      "shots": 188,
+      "snapshots": 0
+    },
+    "phase": "match",
+    "ping_ms": 0,
+    "players": [
+      {
+        "ammo": [
+          10,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "deaths": 1,
+        "hp": 0,
+        "id": 1,
+        "kills": 2,
+        "name": "Pilot",
+        "online": true,
+        "position": [
+          1111.02856445312,
+          862.694946289062
+        ],
+        "seq": 717
+      },
+      {
+        "ammo": [
+          12,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "deaths": 0,
+        "hp": 61,
+        "id": 100,
+        "kills": 0,
+        "name": "Moss",
+        "online": true,
+        "position": [
+          1220.86499023438,
+          1008.08581542969
+        ],
+        "seq": 0
+      },
+      {
+        "ammo": [
+          10,
+          24,
+          0,
+          0,
+          0,
+          0
+        ],
+        "deaths": 0,
+        "hp": 76,
+        "id": 2,
+        "kills": 1,
+        "name": "LanBravo",
+        "online": false,
+        "position": [
+          1314.18981933594,
+          1115.18176269531
+        ],
+        "seq": 687
+      },
+      {
+        "ammo": [
+          11,
+          0,
+          0,
+          0,
+          0,
+          7
+        ],
+        "deaths": 3,
+        "hp": 0,
+        "id": 3,
+        "kills": 1,
+        "name": "LanAlpha",
+        "online": false,
+        "position": [
+          1236.22473144531,
+          921.5888671875
+        ],
+        "seq": 686
+      }
+    ],
+    "room": "",
+    "status": "LAN HOST \u00b7 UDP 29802",
+    "time": 11.9666666666668
+  },
+  "scan": {
+    "discovered": {
+      "127.0.0.1:28760.0": {
+        "game": "Skybreak",
+        "ip": "127.0.0.1",
+        "name": "Pilot's room",
+        "players": 1.0,
+        "port": 28760.0
+      },
+      "192.168.1.25:28760.0": {
+        "game": "Skybreak",
+        "ip": "192.168.1.25",
+        "name": "Pilot's room",
+        "players": 1.0,
+        "port": 28760.0
+      }
+    },
+    "lobby_status": "OFFLINE",
+    "local_id": 0,
+    "metrics": {
+      "hits": 0,
+      "kills": 0,
+      "max_snapshot_bytes": 0,
+      "reconnects": 0,
+      "rejected": 0,
+      "shots": 0,
+      "snapshots": 0
+    },
+    "phase": "",
+    "ping_ms": 0,
+    "players": [],
+    "room": "",
+    "status": "OFFLINE",
+    "time": 0
+  },
+  "a": {
+    "discovered": {},
+    "lobby_status": "OFFLINE",
+    "local_id": 3,
+    "metrics": {
+      "hits": 22,
+      "kills": 4,
+      "max_snapshot_bytes": 0,
+      "reconnects": 0,
+      "rejected": 0,
+      "shots": 188,
+      "snapshots": 233
+    },
+    "phase": "match",
+    "ping_ms": 24,
+    "players": [
+      {
+        "ammo": [
+          10,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "deaths": 1,
+        "hp": 0,
+        "id": 1,
+        "kills": 2,
+        "name": "Pilot",
+        "online": true,
+        "position": [
+          1111.02856445312,
+          862.694946289062
+        ],
+        "seq": 694
+      },
+      {
+        "ammo": [
+          12,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "deaths": 0,
+        "hp": 61,
+        "id": 100,
+        "kills": 0,
+        "name": "Moss",
+        "online": true,
+        "position": [
+          1220.86499023438,
+          1063.54138183594
+        ],
+        "seq": 0
+      },
+      {
+        "ammo": [
+          10,
+          24,
+          0,
+          0,
+          0,
+          0
+        ],
+        "deaths": 0,
+        "hp": 76,
+        "id": 2,
+        "kills": 1,
+        "name": "LanBravo",
+        "online": true,
+        "position": [
+          1338.93981933594,
+          984.662719726562
+        ],
+        "seq": 686
+      },
+      {
+        "ammo": [
+          11,
+          0,
+          0,
+          0,
+          0,
+          7
+        ],
+        "deaths": 3,
+        "hp": 0,
+        "id": 3,
+        "kills": 1,
+        "name": "LanAlpha",
+        "online": true,
+        "position": [
+          1236.22473144531,
+          921.5888671875
+        ],
+        "seq": 685
+      }
+    ],
+    "room": "",
+    "status": "CONNECTED \u00b7 ENet",
+    "time": 11.5833333333335
+  },
+  "b": {
+    "discovered": {},
+    "lobby_status": "OFFLINE",
+    "local_id": 2,
+    "metrics": {
+      "hits": 22,
+      "kills": 4,
+      "max_snapshot_bytes": 0,
+      "reconnects": 0,
+      "rejected": 0,
+      "shots": 188,
+      "snapshots": 232
+    },
+    "phase": "match",
+    "ping_ms": 16,
+    "players": [
+      {
+        "ammo": [
+          10,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "deaths": 1,
+        "hp": 0,
+        "id": 1,
+        "kills": 2,
+        "name": "Pilot",
+        "online": true,
+        "position": [
+          1111.02856445312,
+          862.694946289062
+        ],
+        "seq": 694
+      },
+      {
+        "ammo": [
+          12,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "deaths": 0,
+        "hp": 61,
+        "id": 100,
+        "kills": 0,
+        "name": "Moss",
+        "online": true,
+        "position": [
+          1220.86499023438,
+          1063.54138183594
+        ],
+        "seq": 0
+      },
+      {
+        "ammo": [
+          10,
+          24,
+          0,
+          0,
+          0,
+          0
+        ],
+        "deaths": 0,
+        "hp": 76,
+        "id": 2,
+        "kills": 1,
+        "name": "LanBravo",
+        "online": true,
+        "position": [
+          1338.93981933594,
+          984.662719726562
+        ],
+        "seq": 686
+      },
+      {
+        "ammo": [
+          11,
+          0,
+          0,
+          0,
+          0,
+          7
+        ],
+        "deaths": 3,
+        "hp": 0,
+        "id": 3,
+        "kills": 1,
+        "name": "LanAlpha",
+        "online": true,
+        "position": [
+          1236.22473144531,
+          921.5888671875
+        ],
+        "seq": 685
+      }
+    ],
+    "room": "",
+    "status": "CONNECTED \u00b7 ENet",
+    "time": 11.5833333333335
+  }
+}
