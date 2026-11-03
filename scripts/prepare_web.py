@@ -27,4 +27,8 @@ for name in ('client.js', 'site.css'):
     shutil.copy2(root / 'website' / name, out / name)
 (out / 'lobby.json').write_text(json.dumps({'lobbyUrl': url, 'version': '1.2.0', 'development': development}))
 (out / 'index.wasm.gz').write_bytes(gzip.compress((out / 'index.wasm').read_bytes(), compresslevel=9, mtime=0))
+if os.environ.get('VERCEL'):
+    # Vercel serves physical files before rewrites. Leave only the compressed
+    # artifact so /index.wasm resolves to the gzip body declared in its headers.
+    (out / 'index.wasm').unlink()
 print('Browser game prepared; development controls:', development)
