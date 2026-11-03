@@ -3,7 +3,7 @@
   "framework": null,
   "buildCommand": "bash scripts/build_web.sh",
   "outputDirectory": "builds/web",
-  "installCommand": "echo Static Godot client; no npm install required",
+  "installCommand": "true",
   "headers": [
     {
       "source": "/(.*)",
